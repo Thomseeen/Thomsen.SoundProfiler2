@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundProfiler2", "SoundProfiler2\SoundProfiler2.csproj", "{CAE8C69E-A380-452F-950A-04BAFA61D35C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundProfiler2", "SoundProfiler2\SoundProfiler2.csproj", "{CAE8C69E-A380-452F-950A-04BAFA61D35C}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Util", "Util\Util.shproj", "{A55C416F-A71A-49D8-9D7C-78A10BDB645A}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Util\Util.projitems*{a55c416f-a71a-49d8-9d7c-78a10bdb645a}*SharedItemsImports = 13
+		Util\Util.projitems*{cae8c69e-a380-452f-950a-04bafa61d35c}*SharedItemsImports = 5
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

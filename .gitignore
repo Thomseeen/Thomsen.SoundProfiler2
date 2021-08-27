@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Version Auto Increment - auto-generated C# source
+VersionAutoIncrement.cs

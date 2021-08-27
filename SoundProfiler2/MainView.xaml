@@ -5,9 +5,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SoundProfiler2"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="MainWindow"
+    Title="{Binding MainWindowTitle}"
     Width="800"
     Height="450"
+    d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
     mc:Ignorable="d">
-    <Grid />
+    <StackPanel>
+        <Button Command="{Binding TestCommand}" Content="Test" />
+    </StackPanel>
 </Window>
