@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundProfiler2", "SoundProf
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Util", "Util\Util.shproj", "{A55C416F-A71A-49D8-9D7C-78A10BDB645A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreAudio", "CoreAudio\CoreAudio.csproj", "{2222E8D7-6130-4B46-9749-474E3FE2891B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Util\Util.projitems*{a55c416f-a71a-49d8-9d7c-78a10bdb645a}*SharedItemsImports = 13
@@ -21,6 +23,10 @@ Global
 		{CAE8C69E-A380-452F-950A-04BAFA61D35C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAE8C69E-A380-452F-950A-04BAFA61D35C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAE8C69E-A380-452F-950A-04BAFA61D35C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2222E8D7-6130-4B46-9749-474E3FE2891B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2222E8D7-6130-4B46-9749-474E3FE2891B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2222E8D7-6130-4B46-9749-474E3FE2891B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2222E8D7-6130-4B46-9749-474E3FE2891B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

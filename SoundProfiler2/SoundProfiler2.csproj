@@ -18,6 +18,9 @@
 
   <Import Project="..\Util\Util.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\TextTemplating\Microsoft.TextTemplating.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\CoreAudio\CoreAudio.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="VersionAutoIncrement.tt">
@@ -29,5 +32,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>VersionAutoIncrement.tt</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 </Project>

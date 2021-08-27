@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Util;
@@ -28,9 +22,7 @@ namespace SoundProfiler2 {
         private async void TestAsync() {
             using WaitCursor cursor = new();
 
-            await Task.Delay(500);
-
-            MessageBox.Show("Hello World!");
+            CoreAudioWrapper.GetDeviceNames();
         }
         #endregion Private Methods
     }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Util.MVVM {
     public class BaseViewModel : INotifyPropertyChanged {
