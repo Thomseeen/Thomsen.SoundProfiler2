@@ -19,6 +19,9 @@
   <Import Project="..\Util\Util.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\TextTemplating\Microsoft.TextTemplating.targets" />
   <ItemGroup>
+    <Compile Remove="AudioManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CoreAudio\CoreAudio.csproj" />
   </ItemGroup>
 
