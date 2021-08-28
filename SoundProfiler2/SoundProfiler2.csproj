@@ -22,10 +22,48 @@
     <Compile Remove="AudioManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Resources\Exit_16x.png" />
+    <None Remove="Resources\NewFile_16x.png" />
+    <None Remove="Resources\OpenFile_16x.png" />
+    <None Remove="Resources\Refresh_16x.png" />
+    <None Remove="Resources\Save_16x.png" />
+    <None Remove="Resources\Test_16x.png" />
+    <None Remove="Resources\ToggleOfficeKeyboardScheme_16x.png" />
+    <None Remove="Resources\Win32Project_16x.ico" />
+    <None Remove="Resources\Win32Project_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CoreAudio\CoreAudio.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Exit_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\NewFile_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\OpenFile_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Refresh_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Save_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Test_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\ToggleOfficeKeyboardScheme_16x.png" />
+    <Resource Include="Resources\Win32Project_16x.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Win32Project_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

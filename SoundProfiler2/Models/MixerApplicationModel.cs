@@ -6,6 +6,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 
 namespace SoundProfiler2.Models {
     public class MixerApplicationModel : INotifyPropertyChanged {
@@ -30,7 +33,15 @@ namespace SoundProfiler2.Models {
 
         public Icon ApplicationIcon {
             get => applicationIcon;
-            set { applicationIcon = value; OnPropertyChanged(); }
+            set { 
+                applicationIcon = value; 
+                OnPropertyChanged(); 
+                OnPropertyChanged(nameof(ApplicationIconBitmapSource)); 
+            }
+        }
+
+        public BitmapSource ApplicationIconBitmapSource {
+            get => Imaging.CreateBitmapSourceFromHIcon(ApplicationIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
         public int VolumeLevel {

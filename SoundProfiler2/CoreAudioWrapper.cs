@@ -59,6 +59,11 @@ namespace SoundProfiler2 {
                     session.GetDisplayName(out string displayName);
                     session.GetProcessId(out uint pid);
 
+                    if (pid == 0) {
+                        /* Skip idle thread */
+                        continue;
+                    }
+
                     var process = Process.GetProcessById((int)pid);
 
                     string friendlyName;
@@ -71,6 +76,7 @@ namespace SoundProfiler2 {
                             friendlyName = process.ProcessName;
                         }
                     }
+
 
                     Icon icon;
                     try {
