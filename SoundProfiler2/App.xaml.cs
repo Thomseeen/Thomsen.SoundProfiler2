@@ -1,4 +1,6 @@
-﻿using System.Runtime.Versioning;
+﻿using SoundProfiler2.ViewModels;
+using SoundProfiler2.Views;
+using System.Runtime.Versioning;
 using System.Windows;
 
 [assembly: SupportedOSPlatform("windows")]

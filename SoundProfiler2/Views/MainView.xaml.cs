@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace SoundProfiler2 {
+namespace SoundProfiler2.Views {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
