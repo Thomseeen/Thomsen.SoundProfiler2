@@ -49,7 +49,8 @@ namespace SoundProfiler2 {
                             mixerApplications.Add(new MixerApplicationModel() {
                                 ProcessId = (int)pid,
                                 DeviceName = GetFriendlyName(device),
-                                ApplicationName = friendlyName,
+                                FriendlyName = friendlyName,
+                                ProcessName = process.ProcessName,
                                 ApplicationIcon = icon,
                                 VolumeLevel = volumeLevel
                             });

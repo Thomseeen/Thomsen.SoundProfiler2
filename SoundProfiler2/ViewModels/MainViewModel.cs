@@ -1,6 +1,7 @@
 ﻿using SoundProfiler2.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +18,8 @@ namespace SoundProfiler2.ViewModels {
         private bool disposedValue;
         private readonly Timer refreshTimer = new(100);
 
-        private BindingList<MixerApplicationModel> mixerApplications = new();
+        private object mixerApplicationsLock = new();
+        private ObservableCollection<MixerApplicationModel> mixerApplications = new();
 
         #region Commands
         private ICommand refreshCommand;
@@ -28,7 +30,7 @@ namespace SoundProfiler2.ViewModels {
         #endregion Private Fields
 
         #region Public Properties
-        public BindingList<MixerApplicationModel> MixerApplications {
+        public ObservableCollection<MixerApplicationModel> MixerApplications {
             get => mixerApplications;
             set { mixerApplications = value; OnPropertyChanged(); }
         }
@@ -58,17 +60,31 @@ namespace SoundProfiler2.ViewModels {
             await Task.Run(() => {
                 MixerApplicationModel[] newMixerApplications = CoreAudioWrapper.GetMixerApplications();
 
-                /* Only add new apps and refresh volume on old ones */
-                foreach (MixerApplicationModel newMixerApplication in newMixerApplications) {
-                    if (!MixerApplications.Any(mixerApp => mixerApp.Equals(newMixerApplication))) {
-                        newMixerApplication.PropertyChanged += MixerApplication_PropertyChanged;
-                        Application.Current.Dispatcher.Invoke(() => {
-                            MixerApplications.Add(newMixerApplication);
-                        });
-                    } else {
-                        Application.Current.Dispatcher.Invoke(() => {
-                            MixerApplications.Single(mixerApp => mixerApp.Equals(newMixerApplication)).VolumeLevel = newMixerApplication.VolumeLevel;
-                        });
+                /* Lock so multiple firing events don't overwrite each other, causing duplicate entries */
+                lock (mixerApplicationsLock) {
+                    /* Only add new apps and refresh volume on old ones */
+                    foreach (MixerApplicationModel newMixerApplication in newMixerApplications) {
+                        if (!MixerApplications.Contains(newMixerApplication)) {
+                            newMixerApplication.PropertyChanged += MixerApplication_PropertyChanged;
+
+                            Application.Current.Dispatcher.Invoke(() => {
+                                MixerApplications.Add(newMixerApplication);
+                            });
+                        } else {
+
+                            Application.Current.Dispatcher.Invoke(() => {
+                                MixerApplications.Single(mixerApp => mixerApp.Equals(newMixerApplication)).VolumeLevel = newMixerApplication.VolumeLevel;
+                            });
+                        }
+                    }
+
+                    /* Delete old ones */
+                    foreach (MixerApplicationModel mixerApplication in MixerApplications) {
+                        if (!newMixerApplications.Contains(mixerApplication)) {
+                            Application.Current.Dispatcher.Invoke(() => {
+                                MixerApplications.Remove(mixerApplication);
+                            });
+                        }
                     }
                 }
             });
@@ -76,7 +92,10 @@ namespace SoundProfiler2.ViewModels {
 
         private void MixerApplication_PropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (sender is MixerApplicationModel mixerApplication && e.PropertyName == nameof(MixerApplicationModel.VolumeLevel)) {
+                /* Stop timer so the value isn't refreshed while user adjusts values */
+                refreshTimer.Stop();
                 CoreAudioWrapper.SetMixerApplicationVolume(mixerApplication);
+                refreshTimer.Start();
             }
         }
 

@@ -15,7 +15,8 @@ namespace SoundProfiler2.Models {
         #region Private Fields
         private int processId;
         private string deviceName;
-        private string applicationName;
+        private string friendlyName;
+        private string processName;
         private Icon applicationIcon;
 
         private float volumeLevel;
@@ -32,9 +33,14 @@ namespace SoundProfiler2.Models {
             set { deviceName = value; OnPropertyChanged(); }
         }
 
-        public string ApplicationName {
-            get => applicationName;
-            set { applicationName = value; OnPropertyChanged(); }
+        public string ProcessName {
+            get => processName;
+            set { processName = value; OnPropertyChanged(); }
+        }
+
+        public string FriendlyName {
+            get => friendlyName;
+            set { friendlyName = value; OnPropertyChanged(); }
         }
 
         public Icon ApplicationIcon {
@@ -58,13 +64,18 @@ namespace SoundProfiler2.Models {
 
         #region Base Overrides
         public override int GetHashCode() {
-            return deviceName.GetHashCode() + applicationName.GetHashCode();
+            return ProcessId;
         }
 
         public override bool Equals(object obj) {
             return obj is MixerApplicationModel model &&
                    DeviceName == model.DeviceName &&
-                   ApplicationName == model.ApplicationName;
+                   ProcessId == model.ProcessId &&
+                   ProcessName == model.ProcessName;
+        }
+
+        public override string ToString() {
+            return $"{ProcessId} {DeviceName}:{ProcessName} - {base.ToString()}";
         }
         #endregion Base Overrides
 
