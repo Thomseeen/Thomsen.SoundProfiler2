@@ -79,13 +79,7 @@ namespace SoundProfiler2.ViewModels {
                     }
 
                     /* Delete old ones */
-                    foreach (MixerApplicationModel mixerApplication in MixerApplications) {
-                        if (!newMixerApplications.Contains(mixerApplication)) {
-                            Application.Current.Dispatcher.Invoke(() => {
-                                MixerApplications.Remove(mixerApplication);
-                            });
-                        }
-                    }
+                    MixerApplications.Where(mixerApp => !newMixerApplications.Contains(mixerApp)).ToList().ForEach(mixerApp => Application.Current.Dispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
                 }
             });
         }
