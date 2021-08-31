@@ -33,7 +33,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Header="Profile">
+            <MenuItem Header="Profiles">
                 <MenuItem Header="_New">
                     <MenuItem.Icon>
                         <Image Source="/Resources/NewFile_16x.png" />

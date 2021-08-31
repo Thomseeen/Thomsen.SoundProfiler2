@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Util.MVVM;
 
 namespace SoundProfiler2.Models {
-    public class MixerApplicationModel : INotifyPropertyChanged {
+    public class MixerApplicationModel : BaseModel {
         #region Private Fields
         private int processId;
         private string deviceName;
@@ -78,12 +72,5 @@ namespace SoundProfiler2.Models {
             return $"{ProcessId} {DeviceName}:{ProcessName} - {base.ToString()}";
         }
         #endregion Base Overrides
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "") {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion INotifyPropertyChanged
     }
 }
