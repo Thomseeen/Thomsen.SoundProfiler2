@@ -13,7 +13,7 @@
     d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
     mc:Ignorable="d">
     <DockPanel>
-        <!--  Main Menu  -->
+        <!--  Menu  -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="App">
                 <MenuItem Command="{Binding RefreshCommand}" Header="_Refresh">
@@ -59,6 +59,12 @@
             </MenuItem>
         </Menu>
 
+        <!--  Status Bar  -->
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="Test" />
+        </StatusBar>
+
+        <!--  Main Content  -->
         <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding MixerApplications, Mode=OneWay}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -67,7 +73,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid Width="150">
+                    <Grid Width="120">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30" />
                             <RowDefinition Height="*" />
@@ -76,13 +82,19 @@
                             Grid.Row="0"
                             HorizontalAlignment="Center"
                             Orientation="Horizontal">
-                            <Image Width="16" Source="{Binding ApplicationIconBitmapSource}" />
-                            <Label Grid.Row="0" Content="{Binding ApplicationName}" />
+                            <Image Width="16" Source="{Binding ApplicationIconBitmapSource, Mode=OneWay}" />
+                            <Label
+                                Grid.Row="0"
+                                MaxWidth="100"
+                                Content="{Binding ApplicationName, Mode=OneWay}" />
                         </StackPanel>
                         <Slider
                             Grid.Row="1"
                             HorizontalAlignment="Center"
-                            Orientation="Vertical" />
+                            Maximum="1"
+                            Minimum="0"
+                            Orientation="Vertical"
+                            Value="{Binding VolumeLevel}" />
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

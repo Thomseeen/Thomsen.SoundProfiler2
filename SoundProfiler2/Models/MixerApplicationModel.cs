@@ -13,14 +13,20 @@ using System.Windows.Media.Imaging;
 namespace SoundProfiler2.Models {
     public class MixerApplicationModel : INotifyPropertyChanged {
         #region Private Fields
+        private int processId;
         private string deviceName;
         private string applicationName;
         private Icon applicationIcon;
 
-        private int volumeLevel;
+        private float volumeLevel;
         #endregion Private Fields
 
         #region Public Properties
+        public int ProcessId {
+            get => processId;
+            set { processId = value; OnPropertyChanged(); }
+        }
+
         public string DeviceName {
             get => deviceName;
             set { deviceName = value; OnPropertyChanged(); }
@@ -33,10 +39,10 @@ namespace SoundProfiler2.Models {
 
         public Icon ApplicationIcon {
             get => applicationIcon;
-            set { 
-                applicationIcon = value; 
-                OnPropertyChanged(); 
-                OnPropertyChanged(nameof(ApplicationIconBitmapSource)); 
+            set {
+                applicationIcon = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ApplicationIconBitmapSource));
             }
         }
 
@@ -44,7 +50,7 @@ namespace SoundProfiler2.Models {
             get => Imaging.CreateBitmapSourceFromHIcon(ApplicationIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
-        public int VolumeLevel {
+        public float VolumeLevel {
             get => volumeLevel;
             set { volumeLevel = value; OnPropertyChanged(); }
         }

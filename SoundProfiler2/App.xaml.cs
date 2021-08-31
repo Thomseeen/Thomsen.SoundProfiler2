@@ -9,15 +9,23 @@ namespace SoundProfiler2 {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
+        #region Private Fields
+        private readonly MainView view = new();
+        private readonly MainViewModel viewModel = new();
+        #endregion Private Fields
+
         #region Application Overrides
         protected override void OnStartup(StartupEventArgs e) {
             base.OnStartup(e);
 
-            MainView view = new();
-            MainViewModel viewModel = new();
-
             view.DataContext = viewModel;
             view.Show();
+        }
+
+        protected override void OnExit(ExitEventArgs e) {
+            base.OnExit(e);
+
+            viewModel.Dispose();
         }
         #endregion Application Overrides
     }
