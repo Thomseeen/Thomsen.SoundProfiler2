@@ -6,6 +6,10 @@ using Util.MVVM;
 
 namespace SoundProfiler2.Models {
     public class SettingsModel : BaseModel {
+        #region Constants
+        public const string DEFAULT_SETTINGS_FILEPATH = "settings.json";
+        #endregion Constants
+
         #region Private Fields
         private string filePath;
 
@@ -23,6 +27,34 @@ namespace SoundProfiler2.Models {
             set { categoryMappings = value; OnPropertyChanged(); }
         }
         #endregion Properties
+
+        #region Public Methods
+        public static SettingsModel GetDefaultModel() {
+            return new SettingsModel() {
+                FilePath = DEFAULT_SETTINGS_FILEPATH,
+                CategoryMappings = new ObservableCollection<CategoryMappingModel>() {
+                        new CategoryMappingModel() {
+                            Name = "Multimedia",
+                            Programs = new ObservableCollection<string>() {
+                                "firefox", "edge", "chrome", "spotify", "itunes", "vlc"
+                            }
+                        },
+                        new CategoryMappingModel() {
+                            Name = "Communication",
+                            Programs = new ObservableCollection<string>() {
+                                "teamspeak", "ts3", "discord", "teams", "slack", "skype"
+                            }
+                        },
+                        new CategoryMappingModel() {
+                            Name = "Game",
+                            Programs = new ObservableCollection<string>() {
+                                "dota", "hunt", "ageofempires", "trackmania", "new world"
+                            }
+                        }
+                    }
+            };
+        }
+        #endregion Public Methods
 
         #region Base Overrides
         public override int GetHashCode() {

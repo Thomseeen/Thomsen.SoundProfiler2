@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -18,9 +19,6 @@ using Util.MVVM;
 namespace SoundProfiler2.ViewModels {
     public class MainViewModel : BaseViewModel, IDisposable {
         #region Private Constants
-        private const string DEFAULT_SETTINGS_FILEPATH = "settings.json";
-        private const string DEFAULT_PROFILES_FILEPATH = "profiles.json";
-
         private const string UNMAPPED_CATEGORY = "unmapped";
         #endregion Private Constants
 
@@ -30,10 +28,12 @@ namespace SoundProfiler2.ViewModels {
 
         private readonly object mixerApplicationsLock = new();
 
-        private readonly SettingsModel loadedSettings;
-        private readonly ProfilesModel loadedProfiles;
+        private SettingsModel loadedSettings;
+        private ProfilesModel loadedProfiles;
 
         private ProfileModel activeProfile;
+
+        private bool isProfileNameEditing;
 
         private ObservableCollection<MixerApplicationModel> mixerApplications = new();
 
@@ -42,6 +42,10 @@ namespace SoundProfiler2.ViewModels {
         private ICommand exitCommand;
 
         private ICommand testCommand;
+
+        private ICommand addProfileCommand;
+        private ICommand deleteProfileCommand;
+        private ICommand renameProfileCommand;
         #endregion Commands
         #endregion Private Fields
 
@@ -52,8 +56,13 @@ namespace SoundProfiler2.ViewModels {
         }
 
         public ObservableCollection<ProfileModel> LoadedProfiles {
-            get => loadedProfiles.Profiles;
+            get => loadedProfiles?.Profiles;
             set { loadedProfiles.Profiles = value; OnPropertyChanged(); }
+        }
+
+        public bool IsProfileNameEditing {
+            get => isProfileNameEditing;
+            set { isProfileNameEditing = value; OnPropertyChanged(); }
         }
 
         public ObservableCollection<MixerApplicationModel> MixerApplications {
@@ -65,28 +74,45 @@ namespace SoundProfiler2.ViewModels {
         public ICommand RefreshCommand => refreshCommand ??= new CommandHandler(() => RefreshAsync(), () => true);
         public ICommand ExitCommand => exitCommand ??= new CommandHandler(() => Application.Current.Shutdown(), () => true);
         public ICommand TestCommand => testCommand ??= new CommandHandler(() => Test(), () => true);
+
+        public ICommand AddProfileCommand => addProfileCommand ??= new CommandHandler(() => AddProfile(), () => !IsProfileNameEditing);
+        public ICommand DeleteProfileCommand => deleteProfileCommand ??= new CommandHandler(() => DeleteProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
+        public ICommand RenameProfileCommand => renameProfileCommand ??= new CommandHandler(() => RenameProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
         #endregion Commands
         #endregion Public properties
 
         #region Constructors
         public MainViewModel() {
-            JsonSerializer jsonSerializer = new();
+            try {
+                ReadSettings();
+            } catch (Exception ex) when (ex is FileNotFoundException || ex is JsonSerializationException) {
+                /* Create defaults */
+                loadedSettings = SettingsModel.GetDefaultModel();
+                WriteSettings();
+            }
 
             try {
-                using StreamReader settingsFileReader = new(DEFAULT_SETTINGS_FILEPATH);
-                using JsonTextReader settingsJsonReader = new(settingsFileReader);
-                loadedSettings = jsonSerializer.Deserialize<SettingsModel>(settingsJsonReader);
-
-                using StreamReader profilesFileReader = new(DEFAULT_PROFILES_FILEPATH);
-                using JsonTextReader profilesJsonReader = new(profilesFileReader);
-                loadedProfiles = jsonSerializer.Deserialize<ProfilesModel>(profilesJsonReader);
-            } catch (FileNotFoundException) {
+                ReadProfiles();
+            } catch (Exception ex) when (ex is FileNotFoundException || ex is JsonSerializationException) {
                 /* Create defaults */
-                Test();
+                loadedProfiles = ProfilesModel.GetDefaultModel();
+                WriteProfiles();
             }
 
             refreshTimer.Elapsed += RefreshTimer_Elapsed;
             refreshTimer.Start();
+
+            PropertyChanged += MainViewModel_PropertyChanged;
+        }
+
+        private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == nameof(IsProfileNameEditing)) {
+                /* Finished editing */
+                if (!IsProfileNameEditing) {
+                    WriteProfiles();
+                    ActiveProfile = LoadedProfiles.First();
+                }
+            }
         }
         #endregion Constructors
 
@@ -140,7 +166,6 @@ namespace SoundProfiler2.ViewModels {
                             CategoryVolumeModel volumeCategory = ActiveProfile.CategoryVolumes.FirstOrDefault(category => category.Name == mixerApplication.Category);
                             if (volumeCategory != null) {
                                 mixerApplication.VolumeLevel = volumeCategory.Volume;
-                                CoreAudioWrapper.SetMixerApplicationVolume(mixerApplication);
                             }
                         }
                     }
@@ -158,98 +183,72 @@ namespace SoundProfiler2.ViewModels {
             }
         }
 
-        private static void Test() {
-            SettingsModel settings = new() {
-                FilePath = DEFAULT_SETTINGS_FILEPATH,
-                CategoryMappings = new ObservableCollection<CategoryMappingModel>() {
-                    new CategoryMappingModel() {
-                        Name = "Music",
-                        Programs = new ObservableCollection<string> {"firefox", "spotify"}
-                    },
-                    new CategoryMappingModel() {
-                        Name = "Game",
-                        Programs = new ObservableCollection<string> {"hunt", "trackmania"}
-                    },
-                    new CategoryMappingModel() {
-                        Name = "Voice",
-                        Programs = new ObservableCollection<string> {"ts3", "discord", "teams"}
-                    }
-                }
+        private void AddProfile() {
+            ProfileModel newProfile = new() {
+                Name = "",
+                CategoryVolumes = new ObservableCollection<CategoryVolumeModel>(loadedSettings.CategoryMappings.Select(mapping =>
+                   new CategoryVolumeModel() {
+                       Name = mapping.Name,
+                       Volume = 1
+                   }))
             };
+            LoadedProfiles.Add(newProfile);
+            ActiveProfile = newProfile;
 
-            ProfilesModel profiles = new() {
-                FilePath = DEFAULT_PROFILES_FILEPATH,
-                Profiles = new ObservableCollection<ProfileModel>() {
-                    new ProfileModel() {
-                        Name = "Full Immersion",
-                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
-                            new CategoryVolumeModel() {
-                                Name = "Music",
-                                Volume = 0f
-                            },
-                            new CategoryVolumeModel() {
-                                Name = "Game",
-                                Volume = 1f
-                            },
-                            new CategoryVolumeModel() {
-                                Name = "Voice",
-                                Volume = 1f
-                            }
-                        }
-                    },
-                    new ProfileModel() {
-                        Name = "Casual",
-                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
-                            new CategoryVolumeModel() {
-                                Name = "Music",
-                                Volume = 0.25f
-                            },
-                            new CategoryVolumeModel() {
-                                Name = "Game",
-                                Volume = 0.5f
-                            },
-                            new CategoryVolumeModel() {
-                                Name = "Voice",
-                                Volume = 1f
-                            }
-                        }
-                    },
-                    new ProfileModel() {
-                        Name = "Shut Up",
-                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
-                            new CategoryVolumeModel() {
-                                Name = "Music",
-                                Volume = 0f
-                            },
-                            new CategoryVolumeModel() {
-                                Name = "Game",
-                                Volume = 1f
-                            },
-                            new CategoryVolumeModel() {
-                                Name = "Voice",
-                                Volume = 0.25f
-                            }
-                        }
-                    }
-                }
-            };
+            IsProfileNameEditing = true;
+        }
 
+        private void DeleteProfile() {
+            LoadedProfiles.Remove(ActiveProfile);
+            ActiveProfile = LoadedProfiles.First();
+        }
+
+        private void RenameProfile() {
+            IsProfileNameEditing = true;
+        }
+
+        private void ReadSettings() {
             JsonSerializer jsonSerializer = new();
 
-            using StreamWriter settingsFileWriter = new(settings.FilePath);
-            using JsonTextWriter settingsJsonWriter = new(settingsFileWriter);
-            jsonSerializer.Serialize(settingsJsonWriter, settings);
-
-            using StreamWriter profilesFileWriter = new(profiles.FilePath);
-            using JsonTextWriter profilesJsonWriter = new(profilesFileWriter);
-            jsonSerializer.Serialize(profilesJsonWriter, profiles);
+            using StreamReader settingsFileReader = new(SettingsModel.DEFAULT_SETTINGS_FILEPATH);
+            using JsonTextReader settingsJsonReader = new(settingsFileReader);
+            loadedSettings = jsonSerializer.Deserialize<SettingsModel>(settingsJsonReader);
         }
+
+        private void WriteSettings() {
+            JsonSerializer jsonSerializer = new();
+
+            using StreamWriter settingsFileWriter = new(loadedSettings.FilePath);
+            using JsonTextWriter settingsJsonWriter = new(settingsFileWriter);
+            jsonSerializer.Serialize(settingsJsonWriter, loadedSettings);
+        }
+
+        private void ReadProfiles() {
+            JsonSerializer jsonSerializer = new();
+
+            using StreamReader profilesFileReader = new(ProfilesModel.DEFAULT_PROFILES_FILEPATH);
+            using JsonTextReader profilesJsonReader = new(profilesFileReader);
+            loadedProfiles = jsonSerializer.Deserialize<ProfilesModel>(profilesJsonReader);
+        }
+
+        private void WriteProfiles() {
+            JsonSerializer jsonSerializer = new();
+
+            using StreamWriter profilesFileWriter = new(loadedProfiles.FilePath);
+            using JsonTextWriter profilesJsonWriter = new(profilesFileWriter);
+            jsonSerializer.Serialize(profilesJsonWriter, loadedProfiles);
+        }
+
+        private void Test() { }
         #endregion Private Methods
 
         #region IDisposable
         protected virtual void Dispose(bool disposing) {
             if (!disposedValue) {
                 if (disposing) {
+                    WriteProfiles();
+                    WriteSettings();
+
                     refreshTimer.Stop();
                     refreshTimer.Dispose();
                 }

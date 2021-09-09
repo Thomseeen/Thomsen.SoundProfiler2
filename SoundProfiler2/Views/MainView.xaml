@@ -5,6 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SoundProfiler2.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="clr-namespace:Util"
+    xmlns:uc="clr-namespace:Util.Converter"
     Title="{Binding MainWindowTitle}"
     Width="600"
     Height="400"
@@ -12,6 +14,16 @@
     ResizeMode="NoResize"
     SizeToContent="WidthAndHeight"
     mc:Ignorable="d">
+    <Window.Resources>
+        <uc:VisibilityBooleanConverter
+            x:Key="BoolToVis"
+            Inverted="True"
+            Not="False" />
+        <uc:VisibilityBooleanConverter
+            x:Key="BoolToVisNot"
+            Inverted="True"
+            Not="True" />
+    </Window.Resources>
     <DockPanel>
         <!--  Menu  -->
         <Menu DockPanel.Dock="Top">
@@ -47,14 +59,48 @@
             </MenuItem>
         </Menu>
 
-        <!--  Status Bar  -->
-        <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem Content="{Binding ActiveProfile.Name, Mode=OneWay}" />
-        </StatusBar>
-
         <!--  Profile Sound Mixer  -->
         <GroupBox DockPanel.Dock="Bottom" Header="Profiles">
-            <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <DockPanel Width="120">
+                    <ComboBox
+                        Height="22"
+                        Margin="2"
+                        DisplayMemberPath="Name"
+                        DockPanel.Dock="Top"
+                        ItemsSource="{Binding LoadedProfiles, Mode=OneWay}"
+                        SelectedItem="{Binding ActiveProfile}"
+                        Visibility="{Binding IsProfileNameEditing, Converter={StaticResource BoolToVisNot}, Mode=OneWay}" />
+                    <TextBox
+                        Height="22"
+                        Margin="2"
+                        VerticalContentAlignment="Center"
+                        u:FocusExtension.IsFocused="{Binding IsProfileNameEditing}"
+                        DockPanel.Dock="Top"
+                        Text="{Binding ActiveProfile.Name}"
+                        Visibility="{Binding IsProfileNameEditing, Converter={StaticResource BoolToVis}, Mode=OneWay}" />
+
+                    <Button
+                        Height="20"
+                        Margin="2"
+                        Command="{Binding RenameProfileCommand}"
+                        Content="Rename Profile"
+                        DockPanel.Dock="Bottom" />
+                    <Button
+                        Height="20"
+                        Margin="2"
+                        Command="{Binding DeleteProfileCommand}"
+                        Content="Delete Profile"
+                        DockPanel.Dock="Bottom" />
+                    <Button
+                        Height="20"
+                        Margin="2"
+                        Command="{Binding AddProfileCommand}"
+                        Content="Add Profile"
+                        DockPanel.Dock="Bottom" />
+
+                    <Separator DockPanel.Dock="Bottom" Visibility="Hidden" />
+                </DockPanel>
                 <ItemsControl ItemsSource="{Binding ActiveProfile.CategoryVolumes, Mode=OneWay}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -63,29 +109,26 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Width="120">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="auto" />
-                                </Grid.RowDefinitions>
-                                <Slider
-                                    Grid.Row="0"
-                                    Height="100"
-                                    Margin="10"
-                                    HorizontalAlignment="Center"
-                                    Maximum="1"
-                                    Minimum="0"
-                                    Orientation="Vertical"
-                                    Value="{Binding Volume}" />
-                                <GroupBox Grid.Row="1" Header="{Binding Name, Mode=OneWay}" />
-                            </Grid>
+                            <GroupBox Header="{Binding Name, Mode=OneWay}">
+                                <Grid Width="120">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+                                    <Slider
+                                        Grid.Row="0"
+                                        Height="100"
+                                        Margin="10"
+                                        HorizontalAlignment="Center"
+                                        Maximum="1"
+                                        Minimum="0"
+                                        Orientation="Vertical"
+                                        Value="{Binding Volume}" />
+                                </Grid>
+                            </GroupBox>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <ComboBox
-                    DisplayMemberPath="Name"
-                    ItemsSource="{Binding LoadedProfiles, Mode=OneWay}"
-                    SelectedItem="{Binding ActiveProfile}" />
             </StackPanel>
         </GroupBox>
 
@@ -99,28 +142,31 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Width="120">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Slider
-                                Grid.Row="0"
-                                Height="100"
-                                Margin="10"
-                                HorizontalAlignment="Center"
-                                Maximum="1"
-                                Minimum="0"
-                                Orientation="Vertical"
-                                Value="{Binding VolumeLevel}" />
-                            <GroupBox Grid.Row="1">
-                                <GroupBox.Header>
-                                    <StackPanel MaxWidth="100" Orientation="Horizontal">
-                                        <Image Width="16" Source="{Binding ApplicationIconBitmapSource, Mode=OneWay}" />
-                                        <Label HorizontalAlignment="Center" Content="{Binding FriendlyName}" />
-                                    </StackPanel>
-                                </GroupBox.Header>
-                                <StackPanel MaxWidth="100" Orientation="Vertical">
+                        <GroupBox>
+                            <GroupBox.Header>
+                                <StackPanel MaxWidth="100" Orientation="Horizontal">
+                                    <Image Width="16" Source="{Binding ApplicationIconBitmapSource, Mode=OneWay}" />
+                                    <Label HorizontalAlignment="Center" Content="{Binding FriendlyName, Mode=OneWay}" />
+                                </StackPanel>
+                            </GroupBox.Header>
+                            <Grid Width="120">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Slider
+                                    Grid.Row="0"
+                                    Height="100"
+                                    Margin="10"
+                                    HorizontalAlignment="Center"
+                                    Maximum="1"
+                                    Minimum="0"
+                                    Orientation="Vertical"
+                                    Value="{Binding VolumeLevel}" />
+                                <StackPanel
+                                    Grid.Row="1"
+                                    MaxWidth="100"
+                                    Orientation="Vertical">
                                     <TextBlock>
                                         <TextBlock.Text>
                                             <MultiBinding StringFormat="{}{0}:{1}">
@@ -129,16 +175,10 @@
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
-                                    <TextBlock>
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}Category:{0}">
-                                                <Binding Path="Category" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
+                                    <TextBlock Text="{Binding Category, Mode=OneWay}" />
                                 </StackPanel>
-                            </GroupBox>
-                        </Grid>
+                            </Grid>
+                        </GroupBox>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -6,6 +6,10 @@ using Util.MVVM;
 
 namespace SoundProfiler2.Models {
     public class ProfilesModel : BaseModel {
+        #region Constants
+        public const string DEFAULT_PROFILES_FILEPATH = "profiles.json";
+        #endregion Constants
+
         #region Private Fields
         private string filePath;
 
@@ -23,6 +27,67 @@ namespace SoundProfiler2.Models {
             set { profiles = value; OnPropertyChanged(); }
         }
         #endregion Properties
+
+        #region Public Methods
+        public static ProfilesModel GetDefaultModel() {
+            return new ProfilesModel() {
+                FilePath = DEFAULT_PROFILES_FILEPATH,
+                Profiles = new ObservableCollection<ProfileModel>() {
+                    new ProfileModel() {
+                        Name = "Focus",
+                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
+                            new CategoryVolumeModel() {
+                                Name = "Multimedia",
+                                Volume = 0f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Game",
+                                Volume = 1f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Communication",
+                                Volume = 1f
+                            }
+                        }
+                    },
+                    new ProfileModel() {
+                        Name = "Casual",
+                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
+                            new CategoryVolumeModel() {
+                                Name = "Multimedia",
+                                Volume = 0.25f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Game",
+                                Volume = 0.5f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Communication",
+                                Volume = 1f
+                            }
+                        }
+                    },
+                    new ProfileModel() {
+                        Name = "Immersion",
+                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
+                            new CategoryVolumeModel() {
+                                Name = "Multimedia",
+                                Volume = 0f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Game",
+                                Volume = 1f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Communication",
+                                Volume = 0.25f
+                            }
+                        }
+                    }
+                }
+            };
+        }
+        #endregion Public Methods
 
         #region Base Overrides
         public override int GetHashCode() {

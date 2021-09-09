@@ -9,9 +9,11 @@
     <Import_RootNamespace>Util</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Converter\VisibilityBooleanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomCursor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MVVM\BaseModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MVVM\BaseViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MVVM\CommandHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FocusExtension.cs" />
   </ItemGroup>
 </Project>
