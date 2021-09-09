@@ -1,11 +1,13 @@
 ﻿using SoundProfiler2.Models;
 using SoundProfiler2.Properties;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+
 using Vannatech.CoreAudio.Constants;
 using Vannatech.CoreAudio.Enumerations;
 using Vannatech.CoreAudio.Externals;
@@ -17,47 +19,46 @@ namespace SoundProfiler2 {
         public static MixerApplicationModel[] GetMixerApplications() {
             List<MixerApplicationModel> mixerApplications = new();
 
-            foreach (IMMDevice device in GetDevices()) {
-                try {
-                    foreach (IAudioSessionControl2 session in GetSessions(device)) {
-                        try {
-                            session.GetDisplayName(out string displayName);
-                            session.GetProcessId(out uint pid);
-                            (session as ISimpleAudioVolume).GetMasterVolume(out float volumeLevel);
+            IMMDevice device = GetActiveMultimediaDevice();
+            try {
+                foreach (IAudioSessionControl2 session in GetSessions(device)) {
+                    try {
+                        session.GetDisplayName(out string displayName);
+                        session.GetProcessId(out uint pid);
+                        (session as ISimpleAudioVolume).GetMasterVolume(out float volumeLevel);
 
-                            if (pid == 0) {
-                                /* Skip idle thread */
-                                continue;
-                            }
-
-                            var process = Process.GetProcessById((int)pid);
-
-                            string friendlyName = !string.IsNullOrWhiteSpace(displayName)
-                                ? displayName
-                                : !string.IsNullOrWhiteSpace(process.MainWindowTitle) ? process.MainWindowTitle : process.ProcessName;
-
-                            Icon icon;
-                            try {
-                                icon = Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-                            } catch (Win32Exception) {
-                                icon = Resources.Win32Project_16x_ico;
-                            }
-
-                            mixerApplications.Add(new MixerApplicationModel() {
-                                ProcessId = (int)pid,
-                                DeviceName = GetFriendlyName(device),
-                                FriendlyName = friendlyName,
-                                ProcessName = process.ProcessName,
-                                ApplicationIcon = icon,
-                                VolumeLevel = volumeLevel
-                            });
-                        } finally {
-                            Marshal.ReleaseComObject(session);
+                        if (pid == 0) {
+                            /* Skip idle thread */
+                            continue;
                         }
+
+                        var process = Process.GetProcessById((int)pid);
+
+                        string friendlyName = !string.IsNullOrWhiteSpace(displayName)
+                            ? displayName
+                            : !string.IsNullOrWhiteSpace(process.MainWindowTitle) ? process.MainWindowTitle : process.ProcessName;
+
+                        Icon icon;
+                        try {
+                            icon = Icon.ExtractAssociatedIcon(process.MainModule.FileName);
+                        } catch (Win32Exception) {
+                            icon = Resources.Win32Project_16x_ico;
+                        }
+
+                        mixerApplications.Add(new MixerApplicationModel() {
+                            ProcessId = (int)pid,
+                            DeviceName = GetFriendlyName(device),
+                            FriendlyName = friendlyName,
+                            ProcessName = process.ProcessName,
+                            ApplicationIcon = icon,
+                            VolumeLevel = volumeLevel
+                        });
+                    } finally {
+                        Marshal.ReleaseComObject(session);
                     }
-                } finally {
-                    Marshal.ReleaseComObject(device);
                 }
+            } finally {
+                Marshal.ReleaseComObject(device);
             }
 
             return mixerApplications.ToArray();
@@ -107,6 +108,18 @@ namespace SoundProfiler2 {
                 }
             } finally {
                 Marshal.ReleaseComObject(sessionManager2);
+            }
+        }
+
+        private static IMMDevice GetActiveMultimediaDevice(bool isInput = false) {
+            var deviceEnumeratorType = Type.GetTypeFromCLSID(new Guid(ComCLSIDs.MMDeviceEnumeratorCLSID));
+            IMMDeviceEnumerator deviceEnumerator = (IMMDeviceEnumerator)Activator.CreateInstance(deviceEnumeratorType);
+
+            try {
+                deviceEnumerator.GetDefaultAudioEndpoint(isInput ? EDataFlow.eCapture : EDataFlow.eRender, ERole.eMultimedia, out IMMDevice device);
+                return device;
+            } finally {
+                Marshal.ReleaseComObject(deviceEnumerator);
             }
         }
 

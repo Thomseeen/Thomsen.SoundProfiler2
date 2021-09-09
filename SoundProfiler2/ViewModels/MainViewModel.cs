@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+
 using SoundProfiler2.Models;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
+
 using Util.MVVM;
 
 namespace SoundProfiler2.ViewModels {
