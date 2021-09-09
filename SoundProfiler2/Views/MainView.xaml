@@ -33,27 +33,15 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Header="Profiles">
-                <MenuItem Header="_New">
-                    <MenuItem.Icon>
-                        <Image Source="/Resources/NewFile_16x.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="_Open">
-                    <MenuItem.Icon>
-                        <Image Source="/Resources/OpenFile_16x.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="_Save">
-                    <MenuItem.Icon>
-                        <Image Source="/Resources/Save_16x.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-            </MenuItem>
             <MenuItem Header="Settings">
                 <MenuItem Header="_Keybindings">
                     <MenuItem.Icon>
                         <Image Source="/Resources/ToggleOfficeKeyboardScheme_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Categories">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Choose_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -61,53 +49,99 @@
 
         <!--  Status Bar  -->
         <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem Content="Test" />
+            <StatusBarItem Content="{Binding ActiveProfile.Name, Mode=OneWay}" />
         </StatusBar>
 
-        <!--  Main Content  -->
-        <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding MixerApplications, Mode=OneWay}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Grid Width="120">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Slider
-                            Grid.Row="0"
-                            Height="100"
-                            Margin="10"
-                            HorizontalAlignment="Center"
-                            Maximum="1"
-                            Minimum="0"
-                            Orientation="Vertical"
-                            Value="{Binding VolumeLevel}" />
-                        <GroupBox Grid.Row="1">
-                            <GroupBox.Header>
-                                <StackPanel MaxWidth="100" Orientation="Horizontal">
-                                    <Image Width="16" Source="{Binding ApplicationIconBitmapSource, Mode=OneWay}" />
-                                    <Label HorizontalAlignment="Center" Content="{Binding FriendlyName}" />
+        <!--  Profile Sound Mixer  -->
+        <GroupBox DockPanel.Dock="Bottom" Header="Profiles">
+            <StackPanel>
+                <ItemsControl ItemsSource="{Binding ActiveProfile.CategoryVolumes, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Width="120">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Slider
+                                    Grid.Row="0"
+                                    Height="100"
+                                    Margin="10"
+                                    HorizontalAlignment="Center"
+                                    Maximum="1"
+                                    Minimum="0"
+                                    Orientation="Vertical"
+                                    Value="{Binding Volume}" />
+                                <GroupBox Grid.Row="1" Header="{Binding Name, Mode=OneWay}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ComboBox
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding LoadedProfiles, Mode=OneWay}"
+                    SelectedItem="{Binding ActiveProfile}" />
+            </StackPanel>
+        </GroupBox>
+
+        <!--  Base Sound Mixer  -->
+        <GroupBox DockPanel.Dock="Bottom" Header="Mixer">
+            <ItemsControl ItemsSource="{Binding MixerApplications, Mode=OneWay}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="120">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Slider
+                                Grid.Row="0"
+                                Height="100"
+                                Margin="10"
+                                HorizontalAlignment="Center"
+                                Maximum="1"
+                                Minimum="0"
+                                Orientation="Vertical"
+                                Value="{Binding VolumeLevel}" />
+                            <GroupBox Grid.Row="1">
+                                <GroupBox.Header>
+                                    <StackPanel MaxWidth="100" Orientation="Horizontal">
+                                        <Image Width="16" Source="{Binding ApplicationIconBitmapSource, Mode=OneWay}" />
+                                        <Label HorizontalAlignment="Center" Content="{Binding FriendlyName}" />
+                                    </StackPanel>
+                                </GroupBox.Header>
+                                <StackPanel MaxWidth="100" Orientation="Vertical">
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}:{1}">
+                                                <Binding Path="ProcessId" />
+                                                <Binding Path="ProcessName" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}Category:{0}">
+                                                <Binding Path="Category" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </StackPanel>
-                            </GroupBox.Header>
-                            <StackPanel MaxWidth="100" Orientation="Vertical">
-                                <TextBlock>
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0}:{1}">
-                                            <Binding Path="ProcessId" />
-                                            <Binding Path="ProcessName" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </StackPanel>
-                        </GroupBox>
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                            </GroupBox>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
     </DockPanel>
 </Window>

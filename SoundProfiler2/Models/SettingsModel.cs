@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+
 using Util.MVVM;
 
 namespace SoundProfiler2.Models {
@@ -7,7 +9,7 @@ namespace SoundProfiler2.Models {
         #region Private Fields
         private string filePath;
 
-        private List<CategoryMappingModel> categoryMappings;
+        private ObservableCollection<CategoryMappingModel> categoryMappings;
         #endregion Private Fields
 
         #region Properties
@@ -16,7 +18,7 @@ namespace SoundProfiler2.Models {
             set { filePath = value; OnPropertyChanged(); }
         }
 
-        public List<CategoryMappingModel> CategoryMappings {
+        public ObservableCollection<CategoryMappingModel> CategoryMappings {
             get => categoryMappings;
             set { categoryMappings = value; OnPropertyChanged(); }
         }
@@ -41,7 +43,7 @@ namespace SoundProfiler2.Models {
     public class CategoryMappingModel : BaseModel {
         #region Private Fields
         private string name;
-        private string[] programs;
+        private ObservableCollection<string> programs;
         #endregion Private Fields
 
         #region Properties
@@ -50,7 +52,7 @@ namespace SoundProfiler2.Models {
             set { name = value; OnPropertyChanged(); }
         }
 
-        public string[] Programs {
+        public ObservableCollection<string> Programs {
             get => programs;
             set { programs = value; OnPropertyChanged(); }
         }

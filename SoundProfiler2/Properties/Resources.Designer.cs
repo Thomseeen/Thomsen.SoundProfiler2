@@ -63,6 +63,16 @@ namespace SoundProfiler2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Choose_16x {
+            get {
+                object obj = ResourceManager.GetObject("Choose_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Exit_16x {
             get {
                 object obj = ResourceManager.GetObject("Exit_16x", resourceCulture);

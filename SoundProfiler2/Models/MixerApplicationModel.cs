@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+
 using Util.MVVM;
 
 namespace SoundProfiler2.Models {
@@ -12,6 +13,8 @@ namespace SoundProfiler2.Models {
         private string friendlyName;
         private string processName;
         private Icon applicationIcon;
+
+        private string category;
 
         private float volumeLevel;
         #endregion Private Fields
@@ -48,6 +51,11 @@ namespace SoundProfiler2.Models {
 
         public BitmapSource ApplicationIconBitmapSource {
             get => Imaging.CreateBitmapSourceFromHIcon(ApplicationIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        }
+
+        public string Category {
+            get => category;
+            set { category = value; OnPropertyChanged(); }
         }
 
         public float VolumeLevel {

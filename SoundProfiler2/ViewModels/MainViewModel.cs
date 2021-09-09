@@ -20,16 +20,20 @@ namespace SoundProfiler2.ViewModels {
         #region Private Constants
         private const string DEFAULT_SETTINGS_FILEPATH = "settings.json";
         private const string DEFAULT_PROFILES_FILEPATH = "profiles.json";
+
+        private const string UNMAPPED_CATEGORY = "unmapped";
         #endregion Private Constants
 
         #region Private Fields
         private bool disposedValue;
         private readonly Timer refreshTimer = new(100);
 
-        private object mixerApplicationsLock = new();
+        private readonly object mixerApplicationsLock = new();
 
-        private SettingsModel loadedSettings;
-        private ProfilesModel loadedProfiles;
+        private readonly SettingsModel loadedSettings;
+        private readonly ProfilesModel loadedProfiles;
+
+        private ProfileModel activeProfile;
 
         private ObservableCollection<MixerApplicationModel> mixerApplications = new();
 
@@ -42,6 +46,16 @@ namespace SoundProfiler2.ViewModels {
         #endregion Private Fields
 
         #region Public Properties
+        public ProfileModel ActiveProfile {
+            get => activeProfile;
+            set { activeProfile = value; OnPropertyChanged(); }
+        }
+
+        public ObservableCollection<ProfileModel> LoadedProfiles {
+            get => loadedProfiles.Profiles;
+            set { loadedProfiles.Profiles = value; OnPropertyChanged(); }
+        }
+
         public ObservableCollection<MixerApplicationModel> MixerApplications {
             get => mixerApplications;
             set { mixerApplications = value; OnPropertyChanged(); }
@@ -84,6 +98,7 @@ namespace SoundProfiler2.ViewModels {
 
         #region Private Methods
         private async void RefreshAsync() {
+            refreshTimer.Stop();
             await Task.Run(() => {
                 MixerApplicationModel[] newMixerApplications = CoreAudioWrapper.GetMixerApplications();
 
@@ -107,8 +122,31 @@ namespace SoundProfiler2.ViewModels {
 
                     /* Delete old ones */
                     MixerApplications.Where(mixerApp => !newMixerApplications.Contains(mixerApp)).ToList().ForEach(mixerApp => Application.Current.Dispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
+
+                    /* Map application category */
+                    if (loadedSettings != null) {
+                        foreach (MixerApplicationModel mixerApplication in MixerApplications) {
+                            mixerApplication.Category = loadedSettings.CategoryMappings.FirstOrDefault(category => category.Programs.Any(prog => mixerApplication.ProcessName.ToLower().Contains(prog.ToLower())))?.Name ?? UNMAPPED_CATEGORY;
+                        }
+                    }
+
+                    /* Adapt sound */
+                    if (loadedProfiles != null && loadedProfiles.Profiles?.Count > 0) {
+                        if (ActiveProfile == null) {
+                            ActiveProfile = loadedProfiles.Profiles.First();
+                        }
+
+                        foreach (MixerApplicationModel mixerApplication in MixerApplications) {
+                            CategoryVolumeModel volumeCategory = ActiveProfile.CategoryVolumes.FirstOrDefault(category => category.Name == mixerApplication.Category);
+                            if (volumeCategory != null) {
+                                mixerApplication.VolumeLevel = volumeCategory.Volume;
+                                CoreAudioWrapper.SetMixerApplicationVolume(mixerApplication);
+                            }
+                        }
+                    }
                 }
             });
+            refreshTimer.Start();
         }
 
         private void MixerApplication_PropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -123,41 +161,76 @@ namespace SoundProfiler2.ViewModels {
         private static void Test() {
             SettingsModel settings = new() {
                 FilePath = DEFAULT_SETTINGS_FILEPATH,
-                CategoryMappings = new List<CategoryMappingModel>() {
+                CategoryMappings = new ObservableCollection<CategoryMappingModel>() {
                     new CategoryMappingModel() {
                         Name = "Music",
-                        Programs = new string[] {"firefox", "spotify"}
+                        Programs = new ObservableCollection<string> {"firefox", "spotify"}
                     },
                     new CategoryMappingModel() {
                         Name = "Game",
-                        Programs = new string[] {"hunt", "trackmania"}
+                        Programs = new ObservableCollection<string> {"hunt", "trackmania"}
                     },
                     new CategoryMappingModel() {
                         Name = "Voice",
-                        Programs = new string[] {"ts3", "discord"}
+                        Programs = new ObservableCollection<string> {"ts3", "discord", "teams"}
                     }
                 }
             };
 
             ProfilesModel profiles = new() {
                 FilePath = DEFAULT_PROFILES_FILEPATH,
-                Profiles = new List<ProfileModel>() {
+                Profiles = new ObservableCollection<ProfileModel>() {
                     new ProfileModel() {
                         Name = "Full Immersion",
-                        CategoryVolumes = new Dictionary<string, float>() {
-                            {"Music", 0 },
-                            {"Game", 100 },
-                            {"Voice", 100 }
+                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
+                            new CategoryVolumeModel() {
+                                Name = "Music",
+                                Volume = 0f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Game",
+                                Volume = 1f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Voice",
+                                Volume = 1f
+                            }
                         }
                     },
                     new ProfileModel() {
                         Name = "Casual",
-                        CategoryVolumes = new Dictionary<string, float>() {
-                            {"Music", 25 },
-                            {"Game", 50 },
-                            {"Voice", 100 }
+                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
+                            new CategoryVolumeModel() {
+                                Name = "Music",
+                                Volume = 0.25f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Game",
+                                Volume = 0.5f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Voice",
+                                Volume = 1f
+                            }
                         }
                     },
+                    new ProfileModel() {
+                        Name = "Shut Up",
+                        CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
+                            new CategoryVolumeModel() {
+                                Name = "Music",
+                                Volume = 0f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Game",
+                                Volume = 1f
+                            },
+                            new CategoryVolumeModel() {
+                                Name = "Voice",
+                                Volume = 0.25f
+                            }
+                        }
+                    }
                 }
             };
 
