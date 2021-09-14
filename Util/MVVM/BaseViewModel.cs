@@ -1,10 +1,12 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Util.MVVM {
-    public class BaseViewModel : INotifyPropertyChanged {
+    public class BaseViewModel : INotifyPropertyChanged, IDisposable {
         #region Private Fields
+        private bool isDisposed;
         private string mainWindowTitle = $"{Assembly.GetExecutingAssembly().GetName().Name} ({Assembly.GetExecutingAssembly().GetName().Version})";
         #endregion Private Fields
 
@@ -21,5 +23,19 @@ namespace Util.MVVM {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion INotifyPropertyChanged
+
+        #region IDisposable
+        protected virtual void Dispose(bool disposing) {
+            if (!isDisposed) {
+                if (disposing) { }
+                isDisposed = true;
+            }
+        }
+
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion IDisposable
     }
 }
