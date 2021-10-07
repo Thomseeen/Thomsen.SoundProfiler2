@@ -17,13 +17,13 @@ using System.Windows.Input;
 using Util.MVVM;
 
 namespace SoundProfiler2.ViewModels {
-    public class MainViewModel : BaseViewModel, IDisposable {
+    public class MainViewModel : BaseViewModel {
         #region Private Constants
         private const string UNMAPPED_CATEGORY = "unmapped";
         #endregion Private Constants
 
         #region Private Fields
-        private bool disposedValue;
+        private bool isDisposed = false;
         private readonly Timer refreshTimer = new(100);
 
         private readonly object mixerApplicationsLock = new();
@@ -242,9 +242,9 @@ namespace SoundProfiler2.ViewModels {
         }
         #endregion Private Methods
 
-        #region IDisposable
-        protected virtual void Dispose(bool disposing) {
-            if (!disposedValue) {
+        #region BaseViewModel
+        protected override void Dispose(bool disposing) {
+            if (!isDisposed) {
                 if (disposing) {
                     refreshTimer.Stop();
                     refreshTimer.Dispose();
@@ -252,14 +252,12 @@ namespace SoundProfiler2.ViewModels {
 
                 WriteProfiles();
                 WriteSettings();
-                disposedValue = true;
+                isDisposed = true;
+
+                base.Dispose(true);
             }
         }
 
-        public void Dispose() {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion IDisposable
     }
+    #endregion IDisposable
 }
