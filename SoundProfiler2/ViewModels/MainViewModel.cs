@@ -46,6 +46,7 @@ namespace SoundProfiler2.ViewModels {
         private ICommand addProfileCommand;
         private ICommand deleteProfileCommand;
         private ICommand renameProfileCommand;
+        private ICommand endRenameProfileCommand;
         #endregion Commands
         #endregion Private Fields
 
@@ -78,6 +79,7 @@ namespace SoundProfiler2.ViewModels {
         public ICommand AddProfileCommand => addProfileCommand ??= new CommandHandler(() => AddProfile(), () => !IsProfileNameEditing);
         public ICommand DeleteProfileCommand => deleteProfileCommand ??= new CommandHandler(() => DeleteProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
         public ICommand RenameProfileCommand => renameProfileCommand ??= new CommandHandler(() => RenameProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
+        public ICommand EndRenameProfileCommand => endRenameProfileCommand ??= new CommandHandler(() => EndRenameProfile(), () => IsProfileNameEditing);
         #endregion Commands
         #endregion Public properties
 
@@ -101,18 +103,6 @@ namespace SoundProfiler2.ViewModels {
 
             refreshTimer.Elapsed += RefreshTimer_Elapsed;
             refreshTimer.Start();
-
-            PropertyChanged += MainViewModel_PropertyChanged;
-        }
-
-        private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == nameof(IsProfileNameEditing)) {
-                /* Finished editing */
-                if (!IsProfileNameEditing) {
-                    WriteProfiles();
-                    ActiveProfile = LoadedProfiles.First();
-                }
-            }
         }
         #endregion Constructors
 
@@ -201,10 +191,18 @@ namespace SoundProfiler2.ViewModels {
         private void DeleteProfile() {
             LoadedProfiles.Remove(ActiveProfile);
             ActiveProfile = LoadedProfiles.First();
+
+            WriteProfiles();
         }
 
         private void RenameProfile() {
             IsProfileNameEditing = true;
+        }
+
+        private void EndRenameProfile() {
+            IsProfileNameEditing = false;
+
+            WriteProfiles();
         }
 
         private void ReadSettings() {
@@ -239,19 +237,21 @@ namespace SoundProfiler2.ViewModels {
             jsonSerializer.Serialize(profilesJsonWriter, loadedProfiles);
         }
 
-        private void Test() { }
+        private void Test() {
+            ActiveProfile = LoadedProfiles.First();
+        }
         #endregion Private Methods
 
         #region IDisposable
         protected virtual void Dispose(bool disposing) {
             if (!disposedValue) {
                 if (disposing) {
-                    WriteProfiles();
-                    WriteSettings();
-
                     refreshTimer.Stop();
                     refreshTimer.Dispose();
                 }
+
+                WriteProfiles();
+                WriteSettings();
                 disposedValue = true;
             }
         }
