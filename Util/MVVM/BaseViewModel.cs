@@ -2,11 +2,14 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace Util.MVVM {
     public class BaseViewModel : INotifyPropertyChanged, IDisposable {
         #region Private Fields
         private bool isDisposed;
+        private Window view;
+
         private string mainWindowTitle = $"{Assembly.GetExecutingAssembly().GetName().Name} ({Assembly.GetExecutingAssembly().GetName().Version})";
         #endregion Private Fields
 
@@ -14,6 +17,11 @@ namespace Util.MVVM {
         public string MainWindowTitle {
             get => mainWindowTitle;
             set { mainWindowTitle = value; OnPropertyChanged(); }
+        }
+
+        public Window View {
+            get => view;
+            set { view = value; OnPropertyChanged(); }
         }
         #endregion Public Properties
 

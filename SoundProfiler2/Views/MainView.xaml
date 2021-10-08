@@ -65,13 +65,14 @@
             <StackPanel Orientation="Horizontal">
                 <DockPanel Width="120">
                     <ComboBox
+                        Name="profileComboBox"
                         Height="22"
                         Margin="2"
                         DisplayMemberPath="Name"
                         DockPanel.Dock="Top"
-                        ItemsSource="{Binding LoadedProfiles, Mode=OneWay}"
-                        SelectedItem="{Binding ActiveProfile}"
-                        Visibility="{Binding IsProfileNameEditing, Converter={StaticResource BoolToVisNot}, Mode=OneWay}" />
+                        ItemsSource="{Binding LoadedProfiles.Profiles, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        SelectedItem="{Binding ActiveProfile}" />
+                    <!--  Visibility="{Binding IsProfileNameEditing, Converter={StaticResource BoolToVisNot}, Mode=OneWay}" />  -->
 
                     <TextBox
                         Height="22"
@@ -79,8 +80,8 @@
                         VerticalContentAlignment="Center"
                         u:FocusExtension.IsFocused="{Binding IsProfileNameEditing, Mode=OneWay}"
                         DockPanel.Dock="Top"
-                        Text="{Binding ActiveProfile.Name, UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding IsProfileNameEditing, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                        Text="{Binding ActiveProfile.Name, UpdateSourceTrigger=PropertyChanged}">
+                        <!--  Visibility="{Binding IsProfileNameEditing, Converter={StaticResource BoolToVis}, Mode=OneWay}">  -->
                         <TextBox.InputBindings>
                             <KeyBinding Key="Return" Command="{Binding EndRenameProfileCommand}" />
                         </TextBox.InputBindings>

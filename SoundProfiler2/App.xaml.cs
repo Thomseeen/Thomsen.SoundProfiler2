@@ -1,5 +1,6 @@
 ﻿using SoundProfiler2.ViewModels;
 using SoundProfiler2.Views;
+
 using System.Runtime.Versioning;
 using System.Windows;
 
@@ -17,6 +18,8 @@ namespace SoundProfiler2 {
         #region Application Overrides
         protected override void OnStartup(StartupEventArgs e) {
             base.OnStartup(e);
+
+            viewModel.View = view;
 
             view.DataContext = viewModel;
             view.Show();

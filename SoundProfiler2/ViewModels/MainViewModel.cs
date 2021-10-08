@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 using SoundProfiler2.Models;
+using SoundProfiler2.Views;
 
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 
+using Util;
 using Util.MVVM;
 
 namespace SoundProfiler2.ViewModels {
@@ -56,9 +58,9 @@ namespace SoundProfiler2.ViewModels {
             set { activeProfile = value; OnPropertyChanged(); }
         }
 
-        public ObservableCollection<ProfileModel> LoadedProfiles {
-            get => loadedProfiles?.Profiles;
-            set { loadedProfiles.Profiles = value; OnPropertyChanged(); }
+        public ProfilesModel LoadedProfiles {
+            get => loadedProfiles;
+            set { loadedProfiles = value; OnPropertyChanged(); }
         }
 
         public bool IsProfileNameEditing {
@@ -125,19 +127,19 @@ namespace SoundProfiler2.ViewModels {
                         if (!MixerApplications.Contains(newMixerApplication)) {
                             newMixerApplication.PropertyChanged += MixerApplication_PropertyChanged;
 
-                            Application.Current.Dispatcher.Invoke(() => {
+                            SafeDispatcher.Invoke(() => {
                                 MixerApplications.Add(newMixerApplication);
                             });
                         } else {
 
-                            Application.Current.Dispatcher.Invoke(() => {
+                            SafeDispatcher.Invoke(() => {
                                 MixerApplications.Single(mixerApp => mixerApp.Equals(newMixerApplication)).VolumeLevel = newMixerApplication.VolumeLevel;
                             });
                         }
                     }
 
                     /* Delete old ones */
-                    MixerApplications.Where(mixerApp => !newMixerApplications.Contains(mixerApp)).ToList().ForEach(mixerApp => Application.Current.Dispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
+                    MixerApplications.Where(mixerApp => !newMixerApplications.Contains(mixerApp)).ToList().ForEach(mixerApp => SafeDispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
 
                     /* Map application category */
                     if (loadedSettings != null) {
@@ -182,15 +184,15 @@ namespace SoundProfiler2.ViewModels {
                        Volume = 1
                    }))
             };
-            LoadedProfiles.Add(newProfile);
+            LoadedProfiles.Profiles.Add(newProfile);
             ActiveProfile = newProfile;
 
             IsProfileNameEditing = true;
         }
 
         private void DeleteProfile() {
-            LoadedProfiles.Remove(ActiveProfile);
-            ActiveProfile = LoadedProfiles.First();
+            LoadedProfiles.Profiles.Remove(ActiveProfile);
+            ActiveProfile = LoadedProfiles.Profiles.First();
 
             WriteProfiles();
         }
@@ -203,6 +205,13 @@ namespace SoundProfiler2.ViewModels {
             IsProfileNameEditing = false;
 
             WriteProfiles();
+
+            ProfileModel tmpModel = ActiveProfile;
+            LoadedProfiles.Profiles.Remove(tmpModel);
+            LoadedProfiles.Profiles.Add(tmpModel);
+            ActiveProfile = tmpModel;
+
+            var test = (View as MainView).profileComboBox;
         }
 
         private void ReadSettings() {
@@ -237,8 +246,22 @@ namespace SoundProfiler2.ViewModels {
             jsonSerializer.Serialize(profilesJsonWriter, loadedProfiles);
         }
 
+        private void ProfileUp() {
+            int index = LoadedProfiles.Profiles.IndexOf(ActiveProfile) + 1;
+            index = index >= LoadedProfiles.Profiles.Count ? 0 : index;
+
+            ActiveProfile = LoadedProfiles.Profiles[index];
+        }
+
+        private void ProfileDown() {
+            int index = LoadedProfiles.Profiles.IndexOf(ActiveProfile) - 1;
+            index = index < 0 ? LoadedProfiles.Profiles.Count - 1 : index;
+
+            ActiveProfile = LoadedProfiles.Profiles[index];
+        }
+
         private void Test() {
-            ActiveProfile = LoadedProfiles.First();
+            ProfileUp();
         }
         #endregion Private Methods
 

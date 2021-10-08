@@ -15,5 +15,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)MVVM\BaseViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MVVM\CommandHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FocusExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SafeDispatcher.cs" />
   </ItemGroup>
 </Project>
