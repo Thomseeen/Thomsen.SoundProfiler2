@@ -4,7 +4,7 @@ using System.Windows.Input;
 namespace Util.MVVM {
     public class CommandHandler : ICommand {
         #region Private Fields
-        private readonly Action action;
+        private readonly Action<object> action;
         private readonly Func<bool> canExecute;
         #endregion Private Fields
 
@@ -14,7 +14,7 @@ namespace Util.MVVM {
         /// </summary>
         /// <param name="action">Action to be executed by the command</param>
         /// <param name="canExecute">A bolean property to containing current permissions to execute the command</param>
-        public CommandHandler(Action action, Func<bool> canExecute) {
+        public CommandHandler(Action<object> action, Func<bool> canExecute) {
             this.action = action;
             this.canExecute = canExecute;
         }
@@ -45,7 +45,7 @@ namespace Util.MVVM {
         /// </summary>
         /// <param name="parameter"></param>
         public void Execute(object parameter) {
-            action();
+            action(parameter);
         }
         #endregion Public Methods
     }

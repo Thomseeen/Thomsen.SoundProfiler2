@@ -63,6 +63,16 @@ namespace SoundProfiler2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Add_16x {
+            get {
+                object obj = ResourceManager.GetObject("Add_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Choose_16x {
             get {
                 object obj = ResourceManager.GetObject("Choose_16x", resourceCulture);
@@ -106,6 +116,26 @@ namespace SoundProfiler2.Properties {
         internal static System.Drawing.Bitmap Refresh_16x {
             get {
                 object obj = ResourceManager.GetObject("Refresh_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Remove_color_16x {
+            get {
+                object obj = ResourceManager.GetObject("Remove_color_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Rename_16x {
+            get {
+                object obj = ResourceManager.GetObject("Rename_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

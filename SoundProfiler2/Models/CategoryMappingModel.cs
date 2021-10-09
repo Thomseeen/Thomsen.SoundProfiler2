@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 using Util.MVVM;
 
@@ -6,7 +7,7 @@ namespace SoundProfiler2.Models {
     public class CategoryMappingModel : BaseModel {
         #region Private Fields
         private string name;
-        private ObservableCollection<string> programs;
+        private ObservableCollection<ProgramModel> programs;
         #endregion Private Fields
 
         #region Public Properties
@@ -15,31 +16,54 @@ namespace SoundProfiler2.Models {
             set { name = value; OnPropertyChanged(); }
         }
 
-        public ObservableCollection<string> Programs {
+        public ObservableCollection<ProgramModel> Programs {
             get => programs;
             set { programs = value; OnPropertyChanged(); }
         }
         #endregion Public Properties
+
+        #region Constructors
+        public CategoryMappingModel() { }
+
+        public CategoryMappingModel(string name, IEnumerable<ProgramModel> programs) {
+            Name = name;
+            Programs = new ObservableCollection<ProgramModel>(programs);
+        }
+        #endregion Constructors
 
         #region Public Methods
         public static CategoryMappingModel[] GetDefaultModels() {
             return new CategoryMappingModel[]  {
                 new CategoryMappingModel() {
                     Name = "Multimedia",
-                    Programs = new ObservableCollection<string>() {
-                        "firefox", "edge", "chrome", "spotify", "itunes", "vlc"
+                    Programs = new ObservableCollection<ProgramModel>() {
+                        new ProgramModel("firefox"),
+                        new ProgramModel("edge"),
+                        new ProgramModel("chrome"),
+                        new ProgramModel("spotify"),
+                        new ProgramModel("itunes"),
+                        new ProgramModel("vlc")
                     }
                 },
                 new CategoryMappingModel() {
                     Name = "Communication",
-                    Programs = new ObservableCollection<string>() {
-                        "teamspeak", "ts3", "discord", "teams", "slack", "skype"
+                    Programs = new ObservableCollection<ProgramModel>() {
+                        new ProgramModel("teamspeak"),
+                        new ProgramModel("ts3"),
+                        new ProgramModel("discord"),
+                        new ProgramModel("teams"),
+                        new ProgramModel("slack"),
+                        new ProgramModel("skype")
                     }
                 },
                 new CategoryMappingModel() {
                     Name = "Game",
-                    Programs = new ObservableCollection<string>() {
-                        "dota", "hunt", "ageofempires", "trackmania", "newworld"
+                    Programs = new ObservableCollection<ProgramModel>() {
+                        new ProgramModel("dota"),
+                        new ProgramModel("hunt"),
+                        new ProgramModel("ageofempires"),
+                        new ProgramModel("trackmania"),
+                        new ProgramModel("newworld")
                     }
                 }
             };

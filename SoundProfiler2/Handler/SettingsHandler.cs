@@ -32,7 +32,7 @@ namespace SoundProfiler2.Handler {
             } catch (Exception ex) when (ex is FileNotFoundException or JsonReaderException or JsonSerializationException) {
                 /* Backup invalid file */
                 if (File.Exists(filePath)) {
-                    File.Move(filePath, $"{filePath}.dirty");
+                    File.Move(filePath, $"{filePath}.dirty", true);
                 }
                 /* Create defaults */
                 WriteSettings(defaults, filePath);

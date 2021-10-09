@@ -23,6 +23,15 @@ namespace SoundProfiler2.Models {
         }
         #endregion Public Properties
 
+        #region Constructors
+        public ProfileModel() { }
+
+        public ProfileModel(string name, IEnumerable<CategoryVolumeModel> volumes) {
+            Name = name;
+            CategoryVolumes = new ObservableCollection<CategoryVolumeModel>(volumes);
+        }
+        #endregion Constructors
+
         #region Public Methods
         public static ProfileModel[] GetDefaultModels() {
             return new ProfileModel[] {

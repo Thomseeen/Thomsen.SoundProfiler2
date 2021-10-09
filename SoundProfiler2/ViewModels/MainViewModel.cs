@@ -33,6 +33,7 @@ namespace SoundProfiler2.ViewModels {
         private readonly Timer refreshTimer = new(100);
 
         private readonly object mixerApplicationsLock = new();
+        private readonly object mappingsLock = new();
 
         private ProfileModel activeProfile;
         private ObservableCollection<ProfileModel> loadedProfiles;
@@ -47,7 +48,7 @@ namespace SoundProfiler2.ViewModels {
         private ICommand testCommand;
 
         private ICommand addProfileCommand;
-        private ICommand deleteProfileCommand;
+        private ICommand removeProfileCommand;
         private ICommand beginRenameProfileCommand;
         private ICommand endRenameProfileCommand;
 
@@ -80,17 +81,17 @@ namespace SoundProfiler2.ViewModels {
 
 
         #region Commands
-        public ICommand RefreshCommand => refreshCommand ??= new CommandHandler(() => RefreshAsync(), () => true);
-        public ICommand ExitCommand => exitCommand ??= new CommandHandler(() => Application.Current.Shutdown(), () => true);
-        public ICommand TestCommand => testCommand ??= new CommandHandler(() => Test(), () => true);
+        public ICommand RefreshCommand => refreshCommand ??= new CommandHandler(param => RefreshAsync(), () => true);
+        public ICommand ExitCommand => exitCommand ??= new CommandHandler(param => Application.Current.Shutdown(), () => true);
+        public ICommand TestCommand => testCommand ??= new CommandHandler(param => Test(), () => true);
 
-        public ICommand AddProfileCommand => addProfileCommand ??= new CommandHandler(() => AddProfile(), () => !IsProfileNameEditing);
-        public ICommand DeleteProfileCommand => deleteProfileCommand ??= new CommandHandler(() => DeleteProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
-        public ICommand BeginRenameProfileCommand => beginRenameProfileCommand ??= new CommandHandler(() => BeginRenameProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
-        public ICommand EndRenameProfileCommand => endRenameProfileCommand ??= new CommandHandler(() => EndRenameProfile(), () => IsProfileNameEditing);
+        public ICommand AddProfileCommand => addProfileCommand ??= new CommandHandler(param => AddProfile(), () => !IsProfileNameEditing);
+        public ICommand RemoveProfileCommand => removeProfileCommand ??= new CommandHandler(param => RemoveProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
+        public ICommand BeginRenameProfileCommand => beginRenameProfileCommand ??= new CommandHandler(param => BeginRenameProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
+        public ICommand EndRenameProfileCommand => endRenameProfileCommand ??= new CommandHandler(param => EndRenameProfile(), () => IsProfileNameEditing);
 
-        public ICommand EditKeybindingsCommand => editKeybindingsCommand ??= new CommandHandler(() => EditKeybindings(), () => true);
-        public ICommand EditMappingsCommand => editMappingsCommand ??= new CommandHandler(() => EditMappings(), () => true);
+        public ICommand EditKeybindingsCommand => editKeybindingsCommand ??= new CommandHandler(param => EditKeybindings(), () => true);
+        public ICommand EditMappingsCommand => editMappingsCommand ??= new CommandHandler(param => EditMappings(), () => true);
         #endregion Commands
         #endregion Public properties
 
@@ -124,12 +125,14 @@ namespace SoundProfiler2.ViewModels {
                     }
 
                     /* Apply profile mix */
-                    if (LoadedProfiles is not null && LoadedProfiles?.Count > 0 && !IsProfileNameEditing) {
-                        if (ActiveProfile is null) {
-                            ActiveProfile = LoadedProfiles.First();
-                        }
+                    lock (mappingsLock) {
+                        if (LoadedProfiles is not null && LoadedProfiles?.Count > 0 && !IsProfileNameEditing) {
+                            if (ActiveProfile is null) {
+                                ActiveProfile = LoadedProfiles.First();
+                            }
 
-                        ApplyProfileToActiveMixerApps(ActiveProfile);
+                            ApplyProfileToActiveMixerApps(ActiveProfile);
+                        }
                     }
                 }
             });
@@ -159,7 +162,7 @@ namespace SoundProfiler2.ViewModels {
         private void MapCategoriesIntoActiveMixerApps(ObservableCollection<CategoryMappingModel> loadedMappings) {
             foreach (MixerApplicationModel mixerApplication in MixerApplications) {
                 mixerApplication.Category = loadedMappings.FirstOrDefault(category => category.Programs.Any(prog =>
-                    mixerApplication.ProcessName.ToLower().Replace(" ", "").Contains(prog.ToLower().Replace(" ", ""))
+                    mixerApplication.UnifiedProcessName.Contains(prog.UnifiedName)
                 ))?.Name ?? UNMAPPED_CATEGORY;
             }
         }
@@ -184,8 +187,11 @@ namespace SoundProfiler2.ViewModels {
                        Volume = 1
                    }))
             };
-            LoadedProfiles.Add(newProfile);
-            ActiveProfile = newProfile;
+
+            lock (mappingsLock) {
+                LoadedProfiles.Add(newProfile);
+                ActiveProfile = newProfile;
+            }
 
             SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
 
@@ -193,9 +199,11 @@ namespace SoundProfiler2.ViewModels {
             SetTextBoxFocusAndCursor((View as MainView).profileRenameBox, true);
         }
 
-        private void DeleteProfile() {
-            LoadedProfiles.Remove(ActiveProfile);
-            ActiveProfile = LoadedProfiles.First();
+        private void RemoveProfile() {
+            lock (mappingsLock) {
+                LoadedProfiles.Remove(ActiveProfile);
+                ActiveProfile = LoadedProfiles.First();
+            }
 
             SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
         }
@@ -207,7 +215,6 @@ namespace SoundProfiler2.ViewModels {
 
         private void EndRenameProfile() {
             IsProfileNameEditing = false;
-
             SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
         }
 
@@ -215,32 +222,44 @@ namespace SoundProfiler2.ViewModels {
             int index = LoadedProfiles.IndexOf(ActiveProfile) + 1;
             index = index >= LoadedProfiles.Count ? 0 : index;
 
-            ActiveProfile = LoadedProfiles[index];
+            lock (mappingsLock) {
+                ActiveProfile = LoadedProfiles[index];
+            }
         }
 
         private void ProfileDown() {
             int index = LoadedProfiles.IndexOf(ActiveProfile) - 1;
             index = index < 0 ? LoadedProfiles.Count - 1 : index;
 
-            ActiveProfile = LoadedProfiles[index];
+            lock (mappingsLock) {
+                ActiveProfile = LoadedProfiles[index];
+            }
         }
         #endregion Profile Handling
 
         #region Dialog Handling
-        private void EditKeybindings() {
-
-        }
+        private void EditKeybindings() { }
 
         private void EditMappings() {
-            EditMappingsViewModel mappingsDialog = new(LoadedMappings);
-            mappingsDialog.ShowDialog();
+            lock (mappingsLock) {
+                using EditMappingsViewModel mappingsDialog = new(LoadedMappings);
+                bool? result = mappingsDialog.ShowDialog();
+                if (result.HasValue && result.Value) {
+                    /* Save changed mappings */
+                    LoadedMappings = mappingsDialog.LoadedMappings;
+                    SettingsHandler.WriteSettings(LoadedMappings, DEFAULT_MAPPINGS_FILEPATH);
+                } else {
+                    /* Read old unchanged mappings from disk */
+                    LoadedMappings = new ObservableCollection<CategoryMappingModel>(SettingsHandler.ReadSettings<CategoryMappingModel>(DEFAULT_MAPPINGS_FILEPATH));
+                }
+            }
         }
         #endregion DialogHandling
 
         #region UI Handling
         private static void SetTextBoxFocusAndCursor(TextBox textBox, bool selectAll) {
             textBox.Focus();
-            /* #BUG */
+            /* #BUG: Not working as intended */
             textBox.Select(textBox.Text.Length, selectAll ? textBox.Text.Length : 0);
         }
         #endregion
@@ -267,20 +286,18 @@ namespace SoundProfiler2.ViewModels {
 
         #region BaseViewModel
         protected override void Dispose(bool disposing) {
-            lock (mixerApplicationsLock) {
-                if (!isDisposed) {
-                    if (disposing) {
-                        refreshTimer.Stop();
-                        refreshTimer.Dispose();
-                    }
-
-                    SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
-                    SettingsHandler.WriteSettings(LoadedMappings, DEFAULT_MAPPINGS_FILEPATH);
-
-                    isDisposed = true;
-
-                    base.Dispose(true);
+            if (!isDisposed) {
+                if (disposing) {
+                    refreshTimer.Stop();
+                    refreshTimer.Dispose();
                 }
+
+                SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
+                SettingsHandler.WriteSettings(LoadedMappings, DEFAULT_MAPPINGS_FILEPATH);
+
+                isDisposed = true;
+
+                base.Dispose(true);
             }
         }
         #endregion BaseViewModel

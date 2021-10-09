@@ -31,11 +31,14 @@
     <Compile Remove="AudioManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Resources\Add_16x.png" />
     <None Remove="Resources\Choose_16x.png" />
     <None Remove="Resources\Exit_16x.png" />
     <None Remove="Resources\NewFile_16x.png" />
     <None Remove="Resources\OpenFile_16x.png" />
     <None Remove="Resources\Refresh_16x.png" />
+    <None Remove="Resources\Remove_color_16x.png" />
+    <None Remove="Resources\Rename_16x.png" />
     <None Remove="Resources\Save_16x.png" />
     <None Remove="Resources\Test_16x.png" />
     <None Remove="Resources\ToggleOfficeKeyboardScheme_16x.png" />
@@ -51,6 +54,7 @@
     <ProjectReference Include="..\CoreAudio\CoreAudio.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Add_16x.png" />
     <Resource Include="Resources\Choose_16x.png" />
     <Resource Include="Resources\Exit_16x.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -64,6 +68,8 @@
     <Resource Include="Resources\Refresh_16x.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Remove_color_16x.png" />
+    <Resource Include="Resources\Rename_16x.png" />
     <Resource Include="Resources\Save_16x.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

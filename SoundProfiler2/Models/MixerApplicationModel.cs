@@ -32,8 +32,14 @@ namespace SoundProfiler2.Models {
 
         public string ProcessName {
             get => processName;
-            set { processName = value; OnPropertyChanged(); }
+            set {
+                processName = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(UnifiedProcessName));
+            }
         }
+
+        public string UnifiedProcessName => ProcessName.ToLowerInvariant().Replace(" ", "");
 
         public string FriendlyName {
             get => friendlyName;

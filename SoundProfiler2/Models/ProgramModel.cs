@@ -2,33 +2,31 @@
 using Util.MVVM;
 
 namespace SoundProfiler2.Models {
-    public class CategoryVolumeModel : BaseModel {
+    public class ProgramModel : BaseModel {
         #region Private Fields
         private string name;
-
-        private float volume;
         #endregion Private Fields
 
         #region Public Properties
         public string Name {
             get => name;
-            set { name = value; OnPropertyChanged(); }
+            set {
+                name = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(UnifiedName));
+            }
         }
 
-        public float Volume {
-            get => volume;
-            set { volume = value; OnPropertyChanged(); }
-        }
+        public string UnifiedName => Name.ToLowerInvariant().Replace(" ", "");
         #endregion Public Properties
 
-        #region Constructors
-        public CategoryVolumeModel() { }
+        #region Constructor
+        public ProgramModel() { }
 
-        public CategoryVolumeModel(string name, float volume) {
+        public ProgramModel(string name) {
             Name = name;
-            Volume = volume;
         }
-        #endregion Constructors
+        #endregion Constructor
 
         #region Base Overrides
         public override string ToString() {

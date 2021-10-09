@@ -24,6 +24,11 @@ namespace Util.MVVM {
         public void Show() => view.Show();
 
         public bool? ShowDialog() => view.ShowDialog();
+
+        public void ExitDialog(bool? result) {
+            view.DialogResult = result;
+            view.Close();
+        }
         #endregion Public Methods
 
         #region INotifyPropertyChanged
