@@ -29,7 +29,7 @@ namespace SoundProfiler2.Handler {
         public static IEnumerable<T> ReadOrWriteDefaultSettings<T>(string filePath, IEnumerable<T> defaults) {
             try {
                 return ReadSettings<T>(filePath);
-            } catch (Exception ex) when (ex is FileNotFoundException or JsonSerializationException) {
+            } catch (Exception ex) when (ex is FileNotFoundException or JsonReaderException or JsonSerializationException) {
                 /* Backup invalid file */
                 if (File.Exists(filePath)) {
                     File.Move(filePath, $"{filePath}.dirty");
