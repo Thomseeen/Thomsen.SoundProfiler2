@@ -49,9 +49,7 @@ namespace SoundProfiler2.Models {
             }
         }
 
-        public BitmapSource ApplicationIconBitmapSource {
-            get => Imaging.CreateBitmapSourceFromHIcon(ApplicationIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-        }
+        public BitmapSource ApplicationIconBitmapSource => Imaging.CreateBitmapSourceFromHIcon(ApplicationIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         public string Category {
             get => category;
@@ -65,17 +63,6 @@ namespace SoundProfiler2.Models {
         #endregion Public Properties
 
         #region Base Overrides
-        public override int GetHashCode() {
-            return ProcessId;
-        }
-
-        public override bool Equals(object obj) {
-            return obj is MixerApplicationModel model &&
-                   DeviceName == model.DeviceName &&
-                   ProcessId == model.ProcessId &&
-                   ProcessName == model.ProcessName;
-        }
-
         public override string ToString() {
             return $"{ProcessId} {DeviceName}:{ProcessName} - {base.ToString()}";
         }

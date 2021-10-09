@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-
+using SoundProfiler2.Handler;
 using SoundProfiler2.Models;
 using SoundProfiler2.Views;
 
@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 using Util;
@@ -22,6 +23,9 @@ namespace SoundProfiler2.ViewModels {
     public class MainViewModel : BaseViewModel {
         #region Private Constants
         private const string UNMAPPED_CATEGORY = "unmapped";
+
+        private const string DEFAULT_PROFILES_FILEPATH = "profiles.json";
+        private const string DEFAULT_MAPPINGS_FILEPATH = "mappings.json";
         #endregion Private Constants
 
         #region Private Fields
@@ -30,14 +34,13 @@ namespace SoundProfiler2.ViewModels {
 
         private readonly object mixerApplicationsLock = new();
 
-        private SettingsModel loadedSettings;
-        private ProfilesModel loadedProfiles;
-
         private ProfileModel activeProfile;
+        private ObservableCollection<ProfileModel> loadedProfiles;
+        private ObservableCollection<CategoryMappingModel> loadedMappings;
+        private ObservableCollection<MixerApplicationModel> mixerApplications = new();
 
         private bool isProfileNameEditing;
 
-        private ObservableCollection<MixerApplicationModel> mixerApplications = new();
 
         #region Commands
         private ICommand refreshCommand;
@@ -47,7 +50,7 @@ namespace SoundProfiler2.ViewModels {
 
         private ICommand addProfileCommand;
         private ICommand deleteProfileCommand;
-        private ICommand renameProfileCommand;
+        private ICommand beginRenameProfileCommand;
         private ICommand endRenameProfileCommand;
         #endregion Commands
         #endregion Private Fields
@@ -57,21 +60,23 @@ namespace SoundProfiler2.ViewModels {
             get => activeProfile;
             set { activeProfile = value; OnPropertyChanged(); }
         }
-
-        public ProfilesModel LoadedProfiles {
+        public ObservableCollection<ProfileModel> LoadedProfiles {
             get => loadedProfiles;
             set { loadedProfiles = value; OnPropertyChanged(); }
         }
-
+        public ObservableCollection<CategoryMappingModel> LoadedMappings {
+            get => loadedMappings;
+            set { loadedMappings = value; OnPropertyChanged(); }
+        }
+        public ObservableCollection<MixerApplicationModel> MixerApplications {
+            get => mixerApplications;
+            set { mixerApplications = value; OnPropertyChanged(); }
+        }
         public bool IsProfileNameEditing {
             get => isProfileNameEditing;
             set { isProfileNameEditing = value; OnPropertyChanged(); }
         }
 
-        public ObservableCollection<MixerApplicationModel> MixerApplications {
-            get => mixerApplications;
-            set { mixerApplications = value; OnPropertyChanged(); }
-        }
 
         #region Commands
         public ICommand RefreshCommand => refreshCommand ??= new CommandHandler(() => RefreshAsync(), () => true);
@@ -80,28 +85,15 @@ namespace SoundProfiler2.ViewModels {
 
         public ICommand AddProfileCommand => addProfileCommand ??= new CommandHandler(() => AddProfile(), () => !IsProfileNameEditing);
         public ICommand DeleteProfileCommand => deleteProfileCommand ??= new CommandHandler(() => DeleteProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
-        public ICommand RenameProfileCommand => renameProfileCommand ??= new CommandHandler(() => RenameProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
+        public ICommand BeginRenameProfileCommand => beginRenameProfileCommand ??= new CommandHandler(() => BeginRenameProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
         public ICommand EndRenameProfileCommand => endRenameProfileCommand ??= new CommandHandler(() => EndRenameProfile(), () => IsProfileNameEditing);
         #endregion Commands
         #endregion Public properties
 
         #region Constructors
         public MainViewModel() {
-            try {
-                ReadSettings();
-            } catch (Exception ex) when (ex is FileNotFoundException || ex is JsonSerializationException) {
-                /* Create defaults */
-                loadedSettings = SettingsModel.GetDefaultModel();
-                WriteSettings();
-            }
-
-            try {
-                ReadProfiles();
-            } catch (Exception ex) when (ex is FileNotFoundException || ex is JsonSerializationException) {
-                /* Create defaults */
-                loadedProfiles = ProfilesModel.GetDefaultModel();
-                WriteProfiles();
-            }
+            LoadedMappings = new ObservableCollection<CategoryMappingModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_MAPPINGS_FILEPATH, CategoryMappingModel.GetDefaultModels()));
+            LoadedProfiles = new ObservableCollection<ProfileModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_PROFILES_FILEPATH, ProfileModel.GetDefaultModels()));
 
             refreshTimer.Elapsed += RefreshTimer_Elapsed;
             refreshTimer.Start();
@@ -112,59 +104,6 @@ namespace SoundProfiler2.ViewModels {
         private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e) {
             RefreshAsync();
         }
-        #endregion Event Handler
-
-        #region Private Methods
-        private async void RefreshAsync() {
-            refreshTimer.Stop();
-            await Task.Run(() => {
-                MixerApplicationModel[] newMixerApplications = CoreAudioWrapper.GetMixerApplications();
-
-                /* Lock so multiple firing events don't overwrite each other, causing duplicate entries */
-                lock (mixerApplicationsLock) {
-                    /* Only add new apps and refresh volume on old ones */
-                    foreach (MixerApplicationModel newMixerApplication in newMixerApplications) {
-                        if (!MixerApplications.Contains(newMixerApplication)) {
-                            newMixerApplication.PropertyChanged += MixerApplication_PropertyChanged;
-
-                            SafeDispatcher.Invoke(() => {
-                                MixerApplications.Add(newMixerApplication);
-                            });
-                        } else {
-
-                            SafeDispatcher.Invoke(() => {
-                                MixerApplications.Single(mixerApp => mixerApp.Equals(newMixerApplication)).VolumeLevel = newMixerApplication.VolumeLevel;
-                            });
-                        }
-                    }
-
-                    /* Delete old ones */
-                    MixerApplications.Where(mixerApp => !newMixerApplications.Contains(mixerApp)).ToList().ForEach(mixerApp => SafeDispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
-
-                    /* Map application category */
-                    if (loadedSettings != null) {
-                        foreach (MixerApplicationModel mixerApplication in MixerApplications) {
-                            mixerApplication.Category = loadedSettings.CategoryMappings.FirstOrDefault(category => category.Programs.Any(prog => mixerApplication.ProcessName.ToLower().Contains(prog.ToLower())))?.Name ?? UNMAPPED_CATEGORY;
-                        }
-                    }
-
-                    /* Adapt sound */
-                    if (loadedProfiles != null && loadedProfiles.Profiles?.Count > 0) {
-                        if (ActiveProfile == null) {
-                            ActiveProfile = loadedProfiles.Profiles.First();
-                        }
-
-                        foreach (MixerApplicationModel mixerApplication in MixerApplications) {
-                            CategoryVolumeModel volumeCategory = ActiveProfile.CategoryVolumes.FirstOrDefault(category => category.Name == mixerApplication.Category);
-                            if (volumeCategory != null) {
-                                mixerApplication.VolumeLevel = volumeCategory.Volume;
-                            }
-                        }
-                    }
-                }
-            });
-            refreshTimer.Start();
-        }
 
         private void MixerApplication_PropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (sender is MixerApplicationModel mixerApplication && e.PropertyName == nameof(MixerApplicationModel.VolumeLevel)) {
@@ -174,91 +113,133 @@ namespace SoundProfiler2.ViewModels {
                 refreshTimer.Start();
             }
         }
+        #endregion Event Handler
 
+        #region Private Methods
+        #region Sliders/Volumes Handling
+        private async void RefreshAsync() {
+            refreshTimer.Stop();
+            await Task.Run(() => {
+                /* Lock so multiple firing events don't overwrite each other, causing duplicate entries */
+                lock (mixerApplicationsLock) {
+                    /* Only add new apps and refresh volume on old ones */
+                    MergeRefreshedAppsIntoActivesMixerApps(CoreAudioWrapper.GetMixerApplications());
+
+                    /* Map application category */
+                    if (LoadedMappings is not null) {
+                        MapCategoriesIntoActiveMixerApps(LoadedMappings);
+                    }
+
+                    /* Apply profile mix */
+                    if (LoadedProfiles is not null && LoadedProfiles?.Count > 0 && !IsProfileNameEditing) {
+                        if (ActiveProfile is null) {
+                            ActiveProfile = LoadedProfiles.First();
+                        }
+
+                        ApplyProfileToActiveMixerApps(ActiveProfile);
+                    }
+                }
+            });
+            refreshTimer.Start();
+        }
+
+        private void MergeRefreshedAppsIntoActivesMixerApps(MixerApplicationModel[] newMixerApplications) {
+            foreach (MixerApplicationModel newApp in newMixerApplications) {
+                if (!MixerApplications.Any(activeApp => activeApp.ProcessName == newApp.ProcessName)) {
+                    newApp.PropertyChanged += MixerApplication_PropertyChanged;
+
+                    SafeDispatcher.Invoke(() => {
+                        MixerApplications.Add(newApp);
+                    });
+                } else {
+
+                    SafeDispatcher.Invoke(() => {
+                        MixerApplications.Single(activeApp => activeApp.ProcessName == newApp.ProcessName).VolumeLevel = newApp.VolumeLevel;
+                    });
+                }
+            }
+
+            /* Delete old ones */
+            MixerApplications.Where(activeApp => !newMixerApplications.Any(newApp => newApp.ProcessName == activeApp.ProcessName)).ToList().ForEach(mixerApp => SafeDispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
+        }
+
+        private void MapCategoriesIntoActiveMixerApps(ObservableCollection<CategoryMappingModel> loadedMappings) {
+            foreach (MixerApplicationModel mixerApplication in MixerApplications) {
+                mixerApplication.Category = loadedMappings.FirstOrDefault(category => category.Programs.Any(prog =>
+                    mixerApplication.ProcessName.ToLower().Replace(" ", "").Contains(prog.ToLower().Replace(" ", ""))
+                ))?.Name ?? UNMAPPED_CATEGORY;
+            }
+        }
+
+        private void ApplyProfileToActiveMixerApps(ProfileModel activeProfile) {
+            foreach (MixerApplicationModel mixerApplication in MixerApplications) {
+                CategoryVolumeModel volumeCategory = activeProfile.CategoryVolumes.FirstOrDefault(category => category.Name == mixerApplication.Category);
+                if (volumeCategory is not null) {
+                    mixerApplication.VolumeLevel = volumeCategory.Volume;
+                }
+            }
+        }
+        #endregion Sliders/Volumes Handling
+
+        #region Profile Handling
         private void AddProfile() {
             ProfileModel newProfile = new() {
-                Name = "",
-                CategoryVolumes = new ObservableCollection<CategoryVolumeModel>(loadedSettings.CategoryMappings.Select(mapping =>
+                Name = "New Profile",
+                CategoryVolumes = new ObservableCollection<CategoryVolumeModel>(LoadedMappings.Select(mapping =>
                    new CategoryVolumeModel() {
                        Name = mapping.Name,
                        Volume = 1
                    }))
             };
-            LoadedProfiles.Profiles.Add(newProfile);
+            LoadedProfiles.Add(newProfile);
             ActiveProfile = newProfile;
 
+            SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
+
             IsProfileNameEditing = true;
+            SetTextBoxFocusAndCursor((View as MainView).profileRenameBox, true);
         }
 
         private void DeleteProfile() {
-            LoadedProfiles.Profiles.Remove(ActiveProfile);
-            ActiveProfile = LoadedProfiles.Profiles.First();
+            LoadedProfiles.Remove(ActiveProfile);
+            ActiveProfile = LoadedProfiles.First();
 
-            WriteProfiles();
+            SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
         }
 
-        private void RenameProfile() {
+        private void BeginRenameProfile() {
             IsProfileNameEditing = true;
+            SetTextBoxFocusAndCursor((View as MainView).profileRenameBox, false);
         }
 
         private void EndRenameProfile() {
             IsProfileNameEditing = false;
 
-            WriteProfiles();
-
-            ProfileModel tmpModel = ActiveProfile;
-            LoadedProfiles.Profiles.Remove(tmpModel);
-            LoadedProfiles.Profiles.Add(tmpModel);
-            ActiveProfile = tmpModel;
-
-            var test = (View as MainView).profileComboBox;
-        }
-
-        private void ReadSettings() {
-            JsonSerializer jsonSerializer = new();
-
-            using StreamReader settingsFileReader = new(SettingsModel.DEFAULT_SETTINGS_FILEPATH);
-            using JsonTextReader settingsJsonReader = new(settingsFileReader);
-            loadedSettings = jsonSerializer.Deserialize<SettingsModel>(settingsJsonReader);
-        }
-
-        private void WriteSettings() {
-            JsonSerializer jsonSerializer = new();
-
-            using StreamWriter settingsFileWriter = new(loadedSettings.FilePath);
-            using JsonTextWriter settingsJsonWriter = new(settingsFileWriter);
-            jsonSerializer.Serialize(settingsJsonWriter, loadedSettings);
-        }
-
-        private void ReadProfiles() {
-            JsonSerializer jsonSerializer = new();
-
-            using StreamReader profilesFileReader = new(ProfilesModel.DEFAULT_PROFILES_FILEPATH);
-            using JsonTextReader profilesJsonReader = new(profilesFileReader);
-            loadedProfiles = jsonSerializer.Deserialize<ProfilesModel>(profilesJsonReader);
-        }
-
-        private void WriteProfiles() {
-            JsonSerializer jsonSerializer = new();
-
-            using StreamWriter profilesFileWriter = new(loadedProfiles.FilePath);
-            using JsonTextWriter profilesJsonWriter = new(profilesFileWriter);
-            jsonSerializer.Serialize(profilesJsonWriter, loadedProfiles);
+            SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
         }
 
         private void ProfileUp() {
-            int index = LoadedProfiles.Profiles.IndexOf(ActiveProfile) + 1;
-            index = index >= LoadedProfiles.Profiles.Count ? 0 : index;
+            int index = LoadedProfiles.IndexOf(ActiveProfile) + 1;
+            index = index >= LoadedProfiles.Count ? 0 : index;
 
-            ActiveProfile = LoadedProfiles.Profiles[index];
+            ActiveProfile = LoadedProfiles[index];
         }
 
         private void ProfileDown() {
-            int index = LoadedProfiles.Profiles.IndexOf(ActiveProfile) - 1;
-            index = index < 0 ? LoadedProfiles.Profiles.Count - 1 : index;
+            int index = LoadedProfiles.IndexOf(ActiveProfile) - 1;
+            index = index < 0 ? LoadedProfiles.Count - 1 : index;
 
-            ActiveProfile = LoadedProfiles.Profiles[index];
+            ActiveProfile = LoadedProfiles[index];
         }
+        #endregion Profile Handling
+
+        #region UI Handling
+        private static void SetTextBoxFocusAndCursor(TextBox textBox, bool selectAll) {
+            textBox.Focus();
+            /* #BUG */
+            textBox.Select(textBox.Text.Length, selectAll ? textBox.Text.Length : 0);
+        }
+        #endregion
 
         private void Test() {
             ProfileUp();
@@ -267,20 +248,22 @@ namespace SoundProfiler2.ViewModels {
 
         #region BaseViewModel
         protected override void Dispose(bool disposing) {
-            if (!isDisposed) {
-                if (disposing) {
-                    refreshTimer.Stop();
-                    refreshTimer.Dispose();
+            lock (mixerApplicationsLock) {
+                if (!isDisposed) {
+                    if (disposing) {
+                        refreshTimer.Stop();
+                        refreshTimer.Dispose();
+                    }
+
+                    SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
+                    SettingsHandler.WriteSettings(LoadedMappings, DEFAULT_MAPPINGS_FILEPATH);
+
+                    isDisposed = true;
+
+                    base.Dispose(true);
                 }
-
-                WriteProfiles();
-                WriteSettings();
-                isDisposed = true;
-
-                base.Dispose(true);
             }
         }
-
+        #endregion BaseViewModel
     }
-    #endregion IDisposable
 }
