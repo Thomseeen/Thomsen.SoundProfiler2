@@ -23,6 +23,7 @@
                 Programs get mapped to categories by their process name.
                 The mapping is not case-sensitive and any whitespaces in
                 either the process name or the mapped name get ignored.
+                The mapped name can be a substring of the process name.
             </TextBlock>
         </GroupBox>
         <ItemsControl

@@ -53,7 +53,7 @@ namespace SoundProfiler2 {
                             ApplicationIcon = icon,
                             VolumeLevel = volumeLevel
                         });
-                    } catch (InvalidOperationException) {
+                    } catch (Exception ex) when (ex is InvalidOperationException or ArgumentException) {
                         /* App closed */
                     } finally {
                         Marshal.ReleaseComObject(session);
