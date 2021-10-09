@@ -12,6 +12,7 @@
     Width="600"
     Height="400"
     d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
+    Icon="/Resources/icon.ico"
     ResizeMode="NoResize"
     SizeToContent="WidthAndHeight"
     mc:Ignorable="d">

@@ -10,6 +10,7 @@
     Width="600"
     Height="400"
     d:DataContext="{d:DesignInstance Type=local:EditMappingsViewModel}"
+    Icon="/Resources/icon.ico"
     ResizeMode="NoResize"
     SizeToContent="WidthAndHeight"
     mc:Ignorable="d">

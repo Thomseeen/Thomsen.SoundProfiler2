@@ -11,6 +11,7 @@
     <OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
     <Platforms>AnyCPU;ARM64;x64</Platforms>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,6 +35,8 @@
     <None Remove="Resources\Add_16x.png" />
     <None Remove="Resources\Choose_16x.png" />
     <None Remove="Resources\Exit_16x.png" />
+    <None Remove="Resources\icon.ico" />
+    <None Remove="Resources\icon.png" />
     <None Remove="Resources\NewFile_16x.png" />
     <None Remove="Resources\OpenFile_16x.png" />
     <None Remove="Resources\Refresh_16x.png" />
@@ -59,6 +62,8 @@
     <Resource Include="Resources\Exit_16x.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\icon.ico" />
+    <Resource Include="Resources\icon.png" />
     <Resource Include="Resources\NewFile_16x.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
