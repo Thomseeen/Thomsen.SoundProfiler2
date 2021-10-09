@@ -11,7 +11,7 @@ namespace SoundProfiler2.Models {
         private ObservableCollection<CategoryVolumeModel> categoryVolumes;
         #endregion Private Fields
 
-        #region Properties
+        #region Public Properties
         public string Name {
             get => name;
             set { name = value; OnPropertyChanged(); }
@@ -21,7 +21,7 @@ namespace SoundProfiler2.Models {
             get => categoryVolumes;
             set { categoryVolumes = value; OnPropertyChanged(); }
         }
-        #endregion Properties
+        #endregion Public Properties
 
         #region Public Methods
         public static ProfileModel[] GetDefaultModels() {

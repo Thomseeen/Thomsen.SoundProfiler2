@@ -41,17 +41,18 @@ namespace SoundProfiler2.ViewModels {
 
         private bool isProfileNameEditing;
 
-
         #region Commands
         private ICommand refreshCommand;
         private ICommand exitCommand;
-
         private ICommand testCommand;
 
         private ICommand addProfileCommand;
         private ICommand deleteProfileCommand;
         private ICommand beginRenameProfileCommand;
         private ICommand endRenameProfileCommand;
+
+        private ICommand editKeybindingsCommand;
+        private ICommand editMappingsCommand;
         #endregion Commands
         #endregion Private Fields
 
@@ -87,6 +88,9 @@ namespace SoundProfiler2.ViewModels {
         public ICommand DeleteProfileCommand => deleteProfileCommand ??= new CommandHandler(() => DeleteProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
         public ICommand BeginRenameProfileCommand => beginRenameProfileCommand ??= new CommandHandler(() => BeginRenameProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
         public ICommand EndRenameProfileCommand => endRenameProfileCommand ??= new CommandHandler(() => EndRenameProfile(), () => IsProfileNameEditing);
+
+        public ICommand EditKeybindingsCommand => editKeybindingsCommand ??= new CommandHandler(() => EditKeybindings(), () => true);
+        public ICommand EditMappingsCommand => editMappingsCommand ??= new CommandHandler(() => EditMappings(), () => true);
         #endregion Commands
         #endregion Public properties
 
@@ -221,6 +225,17 @@ namespace SoundProfiler2.ViewModels {
             ActiveProfile = LoadedProfiles[index];
         }
         #endregion Profile Handling
+
+        #region Dialog Handling
+        private void EditKeybindings() {
+
+        }
+
+        private void EditMappings() {
+            EditMappingsViewModel mappingsDialog = new(LoadedMappings);
+            mappingsDialog.ShowDialog();
+        }
+        #endregion DialogHandling
 
         #region UI Handling
         private static void SetTextBoxFocusAndCursor(TextBox textBox, bool selectAll) {

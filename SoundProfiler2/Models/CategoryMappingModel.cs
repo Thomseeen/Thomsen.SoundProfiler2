@@ -9,7 +9,7 @@ namespace SoundProfiler2.Models {
         private ObservableCollection<string> programs;
         #endregion Private Fields
 
-        #region Properties
+        #region Public Properties
         public string Name {
             get => name;
             set { name = value; OnPropertyChanged(); }
@@ -19,7 +19,7 @@ namespace SoundProfiler2.Models {
             get => programs;
             set { programs = value; OnPropertyChanged(); }
         }
-        #endregion Properties
+        #endregion Public Properties
 
         #region Public Methods
         public static CategoryMappingModel[] GetDefaultModels() {

@@ -9,15 +9,10 @@ namespace Util.MVVM {
         #region Private Fields
         private bool isDisposed;
         private Window view;
-
-        private string mainWindowTitle = $"{Assembly.GetExecutingAssembly().GetName().Name} ({Assembly.GetExecutingAssembly().GetName().Version})";
         #endregion Private Fields
 
         #region Public Properties
-        public string MainWindowTitle {
-            get => mainWindowTitle;
-            set { mainWindowTitle = value; OnPropertyChanged(); }
-        }
+        public virtual string WindowTitle => $"{Assembly.GetExecutingAssembly().GetName().Name} ({Assembly.GetExecutingAssembly().GetName().Version})";
 
         public Window View {
             get => view;
@@ -26,9 +21,9 @@ namespace Util.MVVM {
         #endregion Public Properties
 
         #region Public Methods
-        public void Show() {
-            view.Show();
-        }
+        public void Show() => view.Show();
+
+        public bool? ShowDialog() => view.ShowDialog();
         #endregion Public Methods
 
         #region INotifyPropertyChanged

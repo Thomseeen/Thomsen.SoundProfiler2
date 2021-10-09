@@ -9,7 +9,7 @@ namespace SoundProfiler2.Models {
         private float volume;
         #endregion Private Fields
 
-        #region Properties
+        #region Public Properties
         public string Name {
             get => name;
             set { name = value; OnPropertyChanged(); }
@@ -19,7 +19,7 @@ namespace SoundProfiler2.Models {
             get => volume;
             set { volume = value; OnPropertyChanged(); }
         }
-        #endregion Properties
+        #endregion Public Properties
 
         #region Base Overrides
         public override string ToString() {

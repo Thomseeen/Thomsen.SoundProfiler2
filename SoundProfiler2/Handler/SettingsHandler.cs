@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoundProfiler2.Handler {
-    public class SettingsHandler {
+    public static class SettingsHandler {
         #region Public Methods
         public static void WriteSettings<T>(IEnumerable<T> settings, string filePath) {
             JsonSerializer jsonSerializer = new();
