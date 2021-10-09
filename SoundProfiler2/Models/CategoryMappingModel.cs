@@ -39,7 +39,7 @@ namespace SoundProfiler2.Models {
                 new CategoryMappingModel() {
                     Name = "Game",
                     Programs = new ObservableCollection<string>() {
-                        "dota", "hunt", "ageofempires", "trackmania", "new world"
+                        "dota", "hunt", "ageofempires", "trackmania", "newworld"
                     }
                 }
             };
