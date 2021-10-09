@@ -95,25 +95,14 @@ namespace SoundProfiler2.ViewModels {
             LoadedMappings = new ObservableCollection<CategoryMappingModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_MAPPINGS_FILEPATH, CategoryMappingModel.GetDefaultModels()));
             LoadedProfiles = new ObservableCollection<ProfileModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_PROFILES_FILEPATH, ProfileModel.GetDefaultModels()));
 
+            View = new MainView {
+                DataContext = this
+            };
+
             refreshTimer.Elapsed += RefreshTimer_Elapsed;
             refreshTimer.Start();
         }
         #endregion Constructors
-
-        #region Event Handler
-        private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e) {
-            RefreshAsync();
-        }
-
-        private void MixerApplication_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (sender is MixerApplicationModel mixerApplication && e.PropertyName == nameof(MixerApplicationModel.VolumeLevel)) {
-                /* Stop timer so the value isn't refreshed while user adjusts values */
-                refreshTimer.Stop();
-                CoreAudioWrapper.SetMixerApplicationVolume(mixerApplication);
-                refreshTimer.Start();
-            }
-        }
-        #endregion Event Handler
 
         #region Private Methods
         #region Sliders/Volumes Handling
@@ -245,6 +234,21 @@ namespace SoundProfiler2.ViewModels {
             ProfileUp();
         }
         #endregion Private Methods
+
+        #region Event Handler
+        private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e) {
+            RefreshAsync();
+        }
+
+        private void MixerApplication_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (sender is MixerApplicationModel mixerApplication && e.PropertyName == nameof(MixerApplicationModel.VolumeLevel)) {
+                /* Stop timer so the value isn't refreshed while user adjusts values */
+                refreshTimer.Stop();
+                CoreAudioWrapper.SetMixerApplicationVolume(mixerApplication);
+                refreshTimer.Start();
+            }
+        }
+        #endregion Event Handler
 
         #region BaseViewModel
         protected override void Dispose(bool disposing) {

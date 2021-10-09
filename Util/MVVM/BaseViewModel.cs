@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace Util.MVVM {
-    public class BaseViewModel : INotifyPropertyChanged, IDisposable {
+    public abstract class BaseViewModel : INotifyPropertyChanged, IDisposable {
         #region Private Fields
         private bool isDisposed;
         private Window view;
@@ -24,6 +24,12 @@ namespace Util.MVVM {
             set { view = value; OnPropertyChanged(); }
         }
         #endregion Public Properties
+
+        #region Public Methods
+        public void Show() {
+            view.Show();
+        }
+        #endregion Public Methods
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;

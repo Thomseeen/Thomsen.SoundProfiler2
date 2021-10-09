@@ -3,6 +3,7 @@ using SoundProfiler2.Views;
 
 using System.Runtime.Versioning;
 using System.Windows;
+using Util.MVVM;
 
 [assembly: SupportedOSPlatform("windows")]
 namespace SoundProfiler2 {
@@ -11,18 +12,15 @@ namespace SoundProfiler2 {
     /// </summary>
     public partial class App : Application {
         #region Private Fields
-        private readonly MainView view = new();
-        private readonly MainViewModel viewModel = new();
+        private BaseViewModel viewModel;
         #endregion Private Fields
 
         #region Application Overrides
         protected override void OnStartup(StartupEventArgs e) {
             base.OnStartup(e);
 
-            viewModel.View = view;
-
-            view.DataContext = viewModel;
-            view.Show();
+            viewModel = new MainViewModel();
+            viewModel.Show();
         }
 
         protected override void OnExit(ExitEventArgs e) {
