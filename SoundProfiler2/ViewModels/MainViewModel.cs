@@ -119,6 +119,8 @@ namespace SoundProfiler2.ViewModels {
                     /* Only add new apps and refresh volume on old ones */
                     MergeRefreshedAppsIntoActivesMixerApps(CoreAudioWrapper.GetMixerApplications());
 
+                    //MixerApplications = new ObservableCollection<MixerApplicationModel>(MixerApplications.OrderBy(app => app.FriendlyName));
+
                     /* Map application category */
                     if (LoadedMappings is not null) {
                         MapCategoriesIntoActiveMixerApps(LoadedMappings);
@@ -185,7 +187,7 @@ namespace SoundProfiler2.ViewModels {
                    new CategoryVolumeModel() {
                        Name = mapping.Name,
                        Volume = 1
-                   }))
+                   }))//.OrderBy(cat => cat.Name))
             };
 
             lock (mappingsLock) {

@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using Util.MVVM;
 
 namespace SoundProfiler2.Models {
-    public class ProfileModel : BaseModel {
+    public class ProfileModel : BaseModel, ISetting {
         #region Private Fields
         private string name;
 
