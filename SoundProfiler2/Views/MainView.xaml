@@ -16,6 +16,7 @@
     ResizeMode="NoResize"
     SizeToContent="WidthAndHeight"
     mc:Ignorable="d">
+
     <Window.Resources>
         <uc:VisibilityBooleanConverter
             x:Key="BoolToVis"
@@ -26,6 +27,7 @@
             Inverted="True"
             Not="True" />
     </Window.Resources>
+
     <DockPanel>
         <!--  Menu  -->
         <Menu DockPanel.Dock="Top">
@@ -158,6 +160,7 @@
                                         Maximum="1"
                                         Minimum="0"
                                         Orientation="Vertical"
+                                        TickFrequency="0.05"
                                         Value="{Binding Volume}" />
                                 </Grid>
                             </GroupBox>

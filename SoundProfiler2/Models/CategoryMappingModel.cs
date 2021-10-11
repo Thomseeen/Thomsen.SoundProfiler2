@@ -35,17 +35,6 @@ namespace SoundProfiler2.Models {
         public static CategoryMappingModel[] GetDefaultModels() {
             return new CategoryMappingModel[]  {
                 new CategoryMappingModel() {
-                    Name = "Multimedia",
-                    Programs = new ObservableCollection<ProgramModel>() {
-                        new ProgramModel("firefox"),
-                        new ProgramModel("edge"),
-                        new ProgramModel("chrome"),
-                        new ProgramModel("spotify"),
-                        new ProgramModel("itunes"),
-                        new ProgramModel("vlc")
-                    }
-                },
-                new CategoryMappingModel() {
                     Name = "Communication",
                     Programs = new ObservableCollection<ProgramModel>() {
                         new ProgramModel("teamspeak"),
@@ -64,6 +53,17 @@ namespace SoundProfiler2.Models {
                         new ProgramModel("ageofempires"),
                         new ProgramModel("trackmania"),
                         new ProgramModel("newworld")
+                    }
+                },
+                new CategoryMappingModel() {
+                    Name = "Multimedia",
+                    Programs = new ObservableCollection<ProgramModel>() {
+                        new ProgramModel("firefox"),
+                        new ProgramModel("edge"),
+                        new ProgramModel("chrome"),
+                        new ProgramModel("spotify"),
+                        new ProgramModel("itunes"),
+                        new ProgramModel("vlc")
                     }
                 }
             };

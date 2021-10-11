@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+
 using SoundProfiler2.Models;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +13,7 @@ namespace SoundProfiler2.Handler {
     public static class SettingsHandler {
         #region Public Methods
         public static void WriteSettings<T>(IEnumerable<T> settings, string filePath) where T : ISetting {
-            JsonSerializer jsonSerializer = new();
+            JsonSerializer jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
 
             using StreamWriter settingsFileWriter = new(filePath);
             using JsonTextWriter settingsJsonWriter = new(settingsFileWriter);
@@ -19,7 +21,7 @@ namespace SoundProfiler2.Handler {
         }
 
         public static IEnumerable<T> ReadSettings<T>(string filePath) where T : ISetting {
-            JsonSerializer jsonSerializer = new();
+            JsonSerializer jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
 
             using StreamReader settingsFileReader = new(filePath);
             using JsonTextReader settingsJsonReader = new(settingsFileReader);

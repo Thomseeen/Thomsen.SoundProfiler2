@@ -17,7 +17,7 @@ namespace SoundProfiler2.Models {
 
         public float Volume {
             get => volume;
-            set { volume = value; OnPropertyChanged(); }
+            set { volume = value < 0 ? 0 : value > 1 ? 1 : value; OnPropertyChanged(); }
         }
         #endregion Public Properties
 

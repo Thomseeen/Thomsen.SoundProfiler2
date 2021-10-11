@@ -39,7 +39,7 @@ namespace SoundProfiler2.Models {
                         Name = "Default",
                         CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
                             new CategoryVolumeModel() {
-                                Name = "Multimedia",
+                                Name = "Communication",
                                 Volume = 1f
                             },
                             new CategoryVolumeModel() {
@@ -47,7 +47,7 @@ namespace SoundProfiler2.Models {
                                 Volume = 1f
                             },
                             new CategoryVolumeModel() {
-                                Name = "Communication",
+                                Name = "Multimedia",
                                 Volume = 1f
                             }
                         }
@@ -56,16 +56,16 @@ namespace SoundProfiler2.Models {
                         Name = "Focus",
                         CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
                             new CategoryVolumeModel() {
-                                Name = "Multimedia",
-                                Volume = 0f
+                                Name = "Communication",
+                                Volume = 1f
                             },
                             new CategoryVolumeModel() {
                                 Name = "Game",
                                 Volume = 1f
                             },
                             new CategoryVolumeModel() {
-                                Name = "Communication",
-                                Volume = 1f
+                                Name = "Multimedia",
+                                Volume = 0f
                             }
                         }
                     },
@@ -73,16 +73,16 @@ namespace SoundProfiler2.Models {
                         Name = "Casual",
                         CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
                             new CategoryVolumeModel() {
-                                Name = "Multimedia",
-                                Volume = 0.25f
+                                Name = "Communication",
+                                Volume = 1f
                             },
                             new CategoryVolumeModel() {
                                 Name = "Game",
                                 Volume = 0.25f
                             },
                             new CategoryVolumeModel() {
-                                Name = "Communication",
-                                Volume = 1f
+                                Name = "Multimedia",
+                                Volume = 0.25f
                             }
                         }
                     },
@@ -90,16 +90,16 @@ namespace SoundProfiler2.Models {
                         Name = "Immersion",
                         CategoryVolumes = new ObservableCollection<CategoryVolumeModel>() {
                             new CategoryVolumeModel() {
-                                Name = "Multimedia",
-                                Volume = 0f
+                                Name = "Communication",
+                                Volume = 0.25f
                             },
                             new CategoryVolumeModel() {
                                 Name = "Game",
                                 Volume = 1f
                             },
                             new CategoryVolumeModel() {
-                                Name = "Communication",
-                                Volume = 0.25f
+                                Name = "Multimedia",
+                                Volume = 0f
                             }
                         }
                     }

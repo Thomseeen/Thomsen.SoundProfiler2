@@ -25,6 +25,9 @@ namespace SoundProfiler2.ViewModels {
         #region Private Constants
         private const string DEFAULT_PROFILES_FILEPATH = "profiles.json";
         private const string DEFAULT_MAPPINGS_FILEPATH = "mappings.json";
+        private const string DEFAULT_KEYBINDINGS_FILEPATH = "keybindings.json";
+
+        private const float DEFAULT_VOLUME_INC = 0.05f;
         #endregion Private Constants
 
         #region Private Fields
@@ -37,6 +40,7 @@ namespace SoundProfiler2.ViewModels {
         private ProfileModel activeProfile;
         private ObservableCollection<ProfileModel> loadedProfiles;
         private ObservableCollection<CategoryMappingModel> loadedMappings;
+        private ObservableCollection<KeybindingModel> loadedKeybindings;
         private ObservableCollection<MixerApplicationModel> mixerApplications = new();
 
         private bool isProfileNameEditing;
@@ -50,6 +54,12 @@ namespace SoundProfiler2.ViewModels {
         private ICommand removeProfileCommand;
         private ICommand beginRenameProfileCommand;
         private ICommand endRenameProfileCommand;
+
+        private ICommand profileUpCommand;
+        private ICommand profileDownCommand;
+
+        private ICommand volumeUpCommand;
+        private ICommand volumeDownCommand;
 
         private ICommand editKeybindingsCommand;
         private ICommand editMappingsCommand;
@@ -73,6 +83,10 @@ namespace SoundProfiler2.ViewModels {
             get => mixerApplications;
             set { mixerApplications = value; OnPropertyChanged(); }
         }
+        public ObservableCollection<KeybindingModel> LoadedKeybindings {
+            get => loadedKeybindings;
+            set { loadedKeybindings = value; OnPropertyChanged(); }
+        }
         public bool IsProfileNameEditing {
             get => isProfileNameEditing;
             set { isProfileNameEditing = value; OnPropertyChanged(); }
@@ -82,15 +96,28 @@ namespace SoundProfiler2.ViewModels {
         #region Commands
         public ICommand RefreshCommand => refreshCommand ??= new CommandHandler(param => RefreshAsync(), () => true);
         public ICommand ExitCommand => exitCommand ??= new CommandHandler(param => Application.Current.Shutdown(), () => true);
-        public ICommand TestCommand => testCommand ??= new CommandHandler(param => Test(), () => true);
+        public ICommand TestCommand => testCommand ??= new CommandHandler(param => Test(param), () => true);
 
         public ICommand AddProfileCommand => addProfileCommand ??= new CommandHandler(param => AddProfile(), () => !IsProfileNameEditing);
         public ICommand RemoveProfileCommand => removeProfileCommand ??= new CommandHandler(param => RemoveProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
         public ICommand BeginRenameProfileCommand => beginRenameProfileCommand ??= new CommandHandler(param => BeginRenameProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
         public ICommand EndRenameProfileCommand => endRenameProfileCommand ??= new CommandHandler(param => EndRenameProfile(), () => IsProfileNameEditing);
 
+        public ICommand ProfileUpCommand => profileUpCommand ??= new CommandHandler(param => ProfileUp(), () => true);
+        public ICommand ProfileDownCommand => profileDownCommand ??= new CommandHandler(param => ProfileDown(), () => true);
+
+        public ICommand VolumeUpCommand => volumeUpCommand ??= new CommandHandler(param => VolumeUp(param as string), () => true);
+        public ICommand VolumeDownCommand => volumeDownCommand ??= new CommandHandler(param => VolumeDown(param as string), () => true);
+
         public ICommand EditKeybindingsCommand => editKeybindingsCommand ??= new CommandHandler(param => EditKeybindings(), () => true);
         public ICommand EditMappingsCommand => editMappingsCommand ??= new CommandHandler(param => EditMappings(), () => true);
+
+        public Dictionary<string, ICommand> KeybindableCommands => new() {
+            { nameof(ProfileUpCommand), ProfileUpCommand },
+            { nameof(ProfileDownCommand), ProfileDownCommand },
+            { nameof(VolumeUpCommand), VolumeUpCommand },
+            { nameof(VolumeDownCommand), VolumeDownCommand }
+        };
         #endregion Commands
         #endregion Public properties
 
@@ -98,10 +125,13 @@ namespace SoundProfiler2.ViewModels {
         public MainViewModel() {
             LoadedMappings = new ObservableCollection<CategoryMappingModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_MAPPINGS_FILEPATH, CategoryMappingModel.GetDefaultModels()));
             LoadedProfiles = new ObservableCollection<ProfileModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_PROFILES_FILEPATH, ProfileModel.GetDefaultModels()));
+            LoadedKeybindings = new ObservableCollection<KeybindingModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_KEYBINDINGS_FILEPATH, KeybindingModel.GetDefaultModels()));
 
             View = new MainView {
                 DataContext = this
             };
+
+            ApplyKeybindings();
 
             refreshTimer.Elapsed += RefreshTimer_Elapsed;
             refreshTimer.Start();
@@ -250,6 +280,22 @@ namespace SoundProfiler2.ViewModels {
                 ActiveProfile = LoadedProfiles[index];
             }
         }
+
+        private void VolumeUp(string categoryName) {
+            CategoryVolumeModel category = ActiveProfile.CategoryVolumes.SingleOrDefault(cat => cat.Name == categoryName);
+
+            if (category is not null) {
+                category.Volume += DEFAULT_VOLUME_INC;
+            }
+        }
+
+        private void VolumeDown(string categoryName) {
+            CategoryVolumeModel category = ActiveProfile.CategoryVolumes.SingleOrDefault(cat => cat.Name == categoryName);
+
+            if (category is not null) {
+                category.Volume -= DEFAULT_VOLUME_INC;
+            }
+        }
         #endregion Profile Handling
 
         #region Dialog Handling
@@ -279,8 +325,32 @@ namespace SoundProfiler2.ViewModels {
         }
         #endregion
 
-        private void Test() {
-            ProfileUp();
+        private void Test(object param) {
+            GC.Collect();
+        }
+
+        private void ApplyKeybindings() {
+            View.InputBindings.Clear();
+
+            foreach (KeybindingModel keybinding in LoadedKeybindings) {
+                if (keybinding is CategoryKeybindingModel catKeybinding) {
+                    View.InputBindings.Add(
+                        new KeyBinding(
+                            KeybindableCommands[catKeybinding.Name],
+                            catKeybinding.Key,
+                            catKeybinding.Modifier
+                        ) { CommandParameter = catKeybinding.CategoryName }
+                    );
+                } else {
+                    View.InputBindings.Add(
+                        new KeyBinding(
+                            KeybindableCommands[keybinding.Name],
+                            keybinding.Key,
+                            keybinding.Modifier
+                        )
+                    );
+                }
+            }
         }
         #endregion Private Methods
 
@@ -308,7 +378,6 @@ namespace SoundProfiler2.ViewModels {
                 }
 
                 SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
-                SettingsHandler.WriteSettings(LoadedMappings, DEFAULT_MAPPINGS_FILEPATH);
 
                 isDisposed = true;
 
