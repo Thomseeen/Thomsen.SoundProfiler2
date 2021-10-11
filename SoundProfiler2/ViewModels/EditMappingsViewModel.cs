@@ -1,5 +1,6 @@
 ﻿using SoundProfiler2.Models;
 using SoundProfiler2.Views;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
 using Util.MVVM;
 
 namespace SoundProfiler2.ViewModels {
@@ -21,7 +23,7 @@ namespace SoundProfiler2.ViewModels {
         private ICommand closeCommand;
         private ICommand saveCommand;
         #endregion Commands
-        #endregion Fields
+        #endregion Private Fields
 
         #region Public Properties
         public override string WindowTitle => $"Edit Mappings";

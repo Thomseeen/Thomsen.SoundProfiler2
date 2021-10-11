@@ -17,7 +17,7 @@ namespace SoundProfiler2.Handler {
 
             using StreamWriter settingsFileWriter = new(filePath);
             using JsonTextWriter settingsJsonWriter = new(settingsFileWriter);
-            jsonSerializer.Serialize(settingsJsonWriter, settings.OrderBy(setting => setting.Name));
+            jsonSerializer.Serialize(settingsJsonWriter, settings.OrderBy(setting => setting.Name).ToList());
         }
 
         public static IEnumerable<T> ReadSettings<T>(string filePath) where T : ISetting {

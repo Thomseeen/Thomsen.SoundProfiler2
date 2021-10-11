@@ -297,7 +297,19 @@ namespace SoundProfiler2.ViewModels {
         #endregion Profile Handling
 
         #region Dialog Handling
-        private void EditKeybindings() { }
+        private void EditKeybindings() {
+            using EditKeybindingsViewModel keybindingsDialog = new(LoadedKeybindings);
+            bool? result = keybindingsDialog.ShowDialog();
+            if (result.HasValue && result.Value) {
+                /* Save changed mappings */
+                LoadedKeybindings = keybindingsDialog.LoadedKeybindings;
+                SettingsHandler.WriteSettings(LoadedKeybindings, DEFAULT_KEYBINDINGS_FILEPATH);
+            } else {
+                /* Read old unchanged mappings from disk */
+                LoadedKeybindings = new ObservableCollection<KeybindingModel>(SettingsHandler.ReadSettings<KeybindingModel>(DEFAULT_KEYBINDINGS_FILEPATH));
+            }
+            ApplyKeybindings();
+        }
 
         private void EditMappings() {
             lock (mappingsLock) {

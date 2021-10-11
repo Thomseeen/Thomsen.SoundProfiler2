@@ -24,6 +24,8 @@
                 The mapping is not case-sensitive and any whitespaces in
                 either the process name or the mapped name get ignored.
                 The mapped name can be a substring of the process name.
+                If multiple hits are detected, the one with the longest
+                mapped name will be used.
             </TextBlock>
         </GroupBox>
         <ItemsControl

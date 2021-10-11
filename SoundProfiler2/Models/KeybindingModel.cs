@@ -99,7 +99,7 @@ namespace SoundProfiler2.Models {
 
         #region Base Overrides
         public override string ToString() {
-            return $"{Name} - {base.ToString()}";
+            return $"{Name}";
         }
         #endregion Base Overrides
     }
@@ -118,7 +118,7 @@ namespace SoundProfiler2.Models {
 
         #region Base Overrides
         public override string ToString() {
-            return $"{Name}:{CategoryName} - {base.ToString()}";
+            return $"{Name}:{CategoryName}";
         }
         #endregion Base Overrides
     }
