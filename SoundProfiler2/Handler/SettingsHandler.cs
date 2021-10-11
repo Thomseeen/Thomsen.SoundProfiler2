@@ -17,7 +17,7 @@ namespace SoundProfiler2.Handler {
 
             using StreamWriter settingsFileWriter = new(filePath);
             using JsonTextWriter settingsJsonWriter = new(settingsFileWriter);
-            jsonSerializer.Serialize(settingsJsonWriter, settings);
+            jsonSerializer.Serialize(settingsJsonWriter, settings.OrderBy(setting => setting.Name));
         }
 
         public static IEnumerable<T> ReadSettings<T>(string filePath) where T : ISetting {
@@ -25,7 +25,7 @@ namespace SoundProfiler2.Handler {
 
             using StreamReader settingsFileReader = new(filePath);
             using JsonTextReader settingsJsonReader = new(settingsFileReader);
-            return jsonSerializer.Deserialize<IEnumerable<T>>(settingsJsonReader);//.OrderBy(setting => setting.Name);
+            return jsonSerializer.Deserialize<IEnumerable<T>>(settingsJsonReader).OrderBy(setting => setting.Name);
         }
 
         public static IEnumerable<T> ReadOrWriteDefaultSettings<T>(string filePath, IEnumerable<T> defaults) where T : ISetting {
