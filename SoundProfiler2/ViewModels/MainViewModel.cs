@@ -23,8 +23,6 @@ using Util.MVVM;
 namespace SoundProfiler2.ViewModels {
     public class MainViewModel : BaseViewModel {
         #region Private Constants
-        private const string UNMAPPED_CATEGORY = "unmapped";
-
         private const string DEFAULT_PROFILES_FILEPATH = "profiles.json";
         private const string DEFAULT_MAPPINGS_FILEPATH = "mappings.json";
         #endregion Private Constants
@@ -180,7 +178,7 @@ namespace SoundProfiler2.ViewModels {
                         }
                     }
                 }
-                mixerApplication.Category = matchCategory?.Name ?? UNMAPPED_CATEGORY;
+                mixerApplication.Category = matchCategory?.Name ?? MixerApplicationModel.UNMAPPED_CATEGORY;
             }
         }
 

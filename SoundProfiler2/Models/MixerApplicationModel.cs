@@ -7,6 +7,10 @@ using Util.MVVM;
 
 namespace SoundProfiler2.Models {
     public class MixerApplicationModel : BaseModel {
+        #region Public Constants
+        public const string UNMAPPED_CATEGORY = "unmapped";
+        #endregion Public Constants
+
         #region Private Fields
         private int processId;
         private string deviceName;
@@ -59,13 +63,19 @@ namespace SoundProfiler2.Models {
 
         public string Category {
             get => category;
-            set { category = value; OnPropertyChanged(); }
+            set {
+                category = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsVolumeEditable));
+            }
         }
 
         public float VolumeLevel {
             get => volumeLevel;
             set { volumeLevel = value; OnPropertyChanged(); }
         }
+
+        public bool IsVolumeEditable => Category == UNMAPPED_CATEGORY;
         #endregion Public Properties
 
         #region Base Overrides

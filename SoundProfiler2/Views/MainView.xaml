@@ -194,6 +194,7 @@
                                     Height="100"
                                     Margin="10"
                                     HorizontalAlignment="Center"
+                                    IsEnabled="{Binding IsVolumeEditable, Mode=OneWay}"
                                     Maximum="1"
                                     Minimum="0"
                                     Orientation="Vertical"
