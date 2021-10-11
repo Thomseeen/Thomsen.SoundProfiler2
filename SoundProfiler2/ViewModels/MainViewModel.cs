@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+
 using SoundProfiler2.Handler;
 using SoundProfiler2.Models;
 using SoundProfiler2.Views;
@@ -112,33 +113,37 @@ namespace SoundProfiler2.ViewModels {
         #region Private Methods
         #region Sliders/Volumes Handling
         private async void RefreshAsync() {
-            refreshTimer.Stop();
-            await Task.Run(() => {
-                /* Lock so multiple firing events don't overwrite each other, causing duplicate entries */
-                lock (mixerApplicationsLock) {
-                    /* Only add new apps and refresh volume on old ones */
-                    MergeRefreshedAppsIntoActivesMixerApps(CoreAudioWrapper.GetMixerApplications());
+            try {
+                refreshTimer.Stop();
+                await Task.Run(() => {
+                    /* Lock so multiple firing events don't overwrite each other, causing duplicate entries */
+                    lock (mixerApplicationsLock) {
+                        /* Only add new apps and refresh volume on old ones */
+                        MergeRefreshedAppsIntoActivesMixerApps(CoreAudioWrapper.GetMixerApplications());
 
-                    //MixerApplications = new ObservableCollection<MixerApplicationModel>(MixerApplications.OrderBy(app => app.FriendlyName));
+                        //MixerApplications = new ObservableCollection<MixerApplicationModel>(MixerApplications.OrderBy(app => app.FriendlyName));
 
-                    /* Map application category */
-                    if (LoadedMappings is not null) {
-                        MapCategoriesIntoActiveMixerApps(LoadedMappings);
-                    }
+                        /* Map application category */
+                        if (LoadedMappings is not null) {
+                            MapCategoriesIntoActiveMixerApps(LoadedMappings);
+                        }
 
-                    /* Apply profile mix */
-                    lock (mappingsLock) {
-                        if (LoadedProfiles is not null && LoadedProfiles?.Count > 0 && !IsProfileNameEditing) {
-                            if (ActiveProfile is null) {
-                                ActiveProfile = LoadedProfiles.First();
+                        /* Apply profile mix */
+                        lock (mappingsLock) {
+                            if (LoadedProfiles is not null && LoadedProfiles?.Count > 0 && !IsProfileNameEditing) {
+                                if (ActiveProfile is null) {
+                                    ActiveProfile = LoadedProfiles.First();
+                                }
+
+                                ApplyProfileToActiveMixerApps(ActiveProfile);
                             }
-
-                            ApplyProfileToActiveMixerApps(ActiveProfile);
                         }
                     }
-                }
-            });
-            refreshTimer.Start();
+                });
+                refreshTimer.Start();
+            } catch (ObjectDisposedException) {
+                /* Closing */
+            }
         }
 
         private void MergeRefreshedAppsIntoActivesMixerApps(MixerApplicationModel[] newMixerApplications) {
