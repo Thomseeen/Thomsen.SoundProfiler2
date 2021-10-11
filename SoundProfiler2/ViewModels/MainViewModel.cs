@@ -148,7 +148,7 @@ namespace SoundProfiler2.ViewModels {
 
         private void MergeRefreshedAppsIntoActivesMixerApps(MixerApplicationModel[] newMixerApplications) {
             foreach (MixerApplicationModel newApp in newMixerApplications) {
-                if (!MixerApplications.Any(activeApp => activeApp.ProcessName == newApp.ProcessName)) {
+                if (!MixerApplications.Any(activeApp => activeApp.ProcessId == newApp.ProcessId)) {
                     newApp.PropertyChanged += MixerApplication_PropertyChanged;
 
                     SafeDispatcher.Invoke(() => {
@@ -157,28 +157,38 @@ namespace SoundProfiler2.ViewModels {
                 } else {
 
                     SafeDispatcher.Invoke(() => {
-                        MixerApplications.Single(activeApp => activeApp.ProcessName == newApp.ProcessName).VolumeLevel = newApp.VolumeLevel;
+                        MixerApplications.Single(activeApp => activeApp.ProcessId == newApp.ProcessId).VolumeLevel = newApp.VolumeLevel;
                     });
                 }
             }
 
             /* Delete old ones */
-            MixerApplications.Where(activeApp => !newMixerApplications.Any(newApp => newApp.ProcessName == activeApp.ProcessName)).ToList().ForEach(mixerApp => SafeDispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
+            MixerApplications.Where(activeApp => !newMixerApplications.Any(newApp => newApp.ProcessId == activeApp.ProcessId)).ToList().ForEach(mixerApp => SafeDispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
         }
 
         private void MapCategoriesIntoActiveMixerApps(ObservableCollection<CategoryMappingModel> loadedMappings) {
             foreach (MixerApplicationModel mixerApplication in MixerApplications) {
-                mixerApplication.Category = loadedMappings.FirstOrDefault(category => category.Programs.Any(prog =>
-                    mixerApplication.UnifiedProcessName.Contains(prog.UnifiedName)
-                ))?.Name ?? UNMAPPED_CATEGORY;
+                CategoryMappingModel matchCategory = null;
+                int matchScore = 0;
+                foreach (CategoryMappingModel category in loadedMappings) {
+                    foreach (ProgramModel program in category.Programs) {
+                        if (mixerApplication.UnifiedProcessName.Contains(program.UnifiedName)) {
+                            if (program.UnifiedName.Length > matchScore) {
+                                matchCategory = category;
+                                matchScore = program.UnifiedName.Length;
+                            }
+                        }
+                    }
+                }
+                mixerApplication.Category = matchCategory?.Name ?? UNMAPPED_CATEGORY;
             }
         }
 
         private void ApplyProfileToActiveMixerApps(ProfileModel activeProfile) {
             foreach (MixerApplicationModel mixerApplication in MixerApplications) {
-                CategoryVolumeModel volumeCategory = activeProfile.CategoryVolumes.FirstOrDefault(category => category.Name == mixerApplication.Category);
-                if (volumeCategory is not null) {
-                    mixerApplication.VolumeLevel = volumeCategory.Volume;
+                CategoryVolumeModel category = activeProfile.CategoryVolumes.FirstOrDefault(category => category.Name == mixerApplication.Category);
+                if (category is not null) {
+                    mixerApplication.VolumeLevel = category.Volume;
                 }
             }
         }
