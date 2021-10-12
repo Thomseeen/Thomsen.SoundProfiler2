@@ -1,36 +1,73 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <Platforms>x64</Platforms>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
+
     <StartupObject>SoundProfiler2.App</StartupObject>
+
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TransformOnBuild>true</TransformOnBuild>
     <OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
-    <Platforms>AnyCPU;ARM64;x64</Platforms>
-    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    <SignAssembly>false</SignAssembly>
+    <Authors>Thomas Wagner</Authors>
+    <Company>Thomas Wagner</Company>
+    <Copyright>Copyright (c) 2021 Thomas Wagner</Copyright>
+    <RepositoryUrl>https://github.com/Thomseeen/SoundProfiler2</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Thomseeen/SoundProfiler2</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl />
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>DEBUG</DefineConstants>
   </PropertyGroup>
 
-  <Import Project="..\Util\Util.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\TextTemplating\Microsoft.TextTemplating.targets" />
+
+  <Import Project="..\Util\Util.projitems" Label="Shared" />
   <ItemGroup>
-    <Compile Remove="AudioManager.cs" />
+    <ProjectReference Include="..\CoreAudio\CoreAudio.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="VersionAutoIncrement.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>VersionAutoIncrement.cs</LastGenOutput>
+    </None>
+    <Compile Update="VersionAutoIncrement.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VersionAutoIncrement.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <ItemGroup>
     <None Remove="Resources\Add_16x.png" />
     <None Remove="Resources\Choose_16x.png" />
@@ -47,74 +84,31 @@
     <None Remove="Resources\ToggleOfficeKeyboardScheme_16x.png" />
     <None Remove="Resources\Win32Project_16x.ico" />
     <None Remove="Resources\Win32Project_16x.png" />
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="Resources\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CoreAudio\CoreAudio.csproj" />
-  </ItemGroup>
+
   <ItemGroup>
     <Resource Include="Resources\Add_16x.png" />
     <Resource Include="Resources\Choose_16x.png" />
-    <Resource Include="Resources\Exit_16x.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\Exit_16x.png" />
     <Resource Include="Resources\icon.ico" />
     <Resource Include="Resources\icon.png" />
-    <Resource Include="Resources\NewFile_16x.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\OpenFile_16x.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Refresh_16x.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\NewFile_16x.png" />
+    <Resource Include="Resources\OpenFile_16x.png" />
+    <Resource Include="Resources\Refresh_16x.png" />
     <Resource Include="Resources\Remove_color_16x.png" />
     <Resource Include="Resources\Rename_16x.png" />
-    <Resource Include="Resources\Save_16x.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Test_16x.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\Save_16x.png" />
+    <Resource Include="Resources\Test_16x.png" />
     <Resource Include="Resources\ToggleOfficeKeyboardScheme_16x.png" />
-    <Resource Include="Resources\Win32Project_16x.ico">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Win32Project_16x.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="VersionAutoIncrement.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>VersionAutoIncrement.cs</LastGenOutput>
-    </None>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Update="VersionAutoIncrement.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>VersionAutoIncrement.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <Resource Include="Resources\Win32Project_16x.ico" />
+    <Resource Include="Resources\Win32Project_16x.png" />
   </ItemGroup>
 </Project>
