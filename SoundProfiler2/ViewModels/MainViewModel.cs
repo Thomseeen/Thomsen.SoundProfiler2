@@ -150,7 +150,7 @@ namespace SoundProfiler2.ViewModels {
                     /* Lock so multiple firing events don't overwrite each other, causing duplicate entries */
                     lock (mixerApplicationsLock) {
                         /* Only add new apps and refresh volume on old ones */
-                        MergeRefreshedAppsIntoActivesMixerApps(CoreAudioWrapper.GetMixerApplications());
+                        MergeRefreshedAppsIntoActivesMixerApps(CoreAudioHandler.GetMixerApplications());
 
                         /* Map application category */
                         if (LoadedMappings is not null) {
@@ -406,7 +406,7 @@ namespace SoundProfiler2.ViewModels {
             if (sender is MixerApplicationModel mixerApplication && e.PropertyName == nameof(MixerApplicationModel.VolumeLevel)) {
                 /* Stop timer so the value isn't refreshed while user adjusts values */
                 refreshTimer.Stop();
-                CoreAudioWrapper.SetMixerApplicationVolume(mixerApplication);
+                CoreAudioHandler.SetMixerApplicationVolume(mixerApplication);
                 refreshTimer.Start();
             }
         }

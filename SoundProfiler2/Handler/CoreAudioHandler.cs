@@ -13,8 +13,8 @@ using Vannatech.CoreAudio.Enumerations;
 using Vannatech.CoreAudio.Externals;
 using Vannatech.CoreAudio.Interfaces;
 
-namespace SoundProfiler2 {
-    public class CoreAudioWrapper {
+namespace SoundProfiler2.Handler {
+    public class CoreAudioHandler {
         #region Public Methods
         public static MixerApplicationModel[] GetMixerApplications() {
             List<MixerApplicationModel> mixerApplications = new();
