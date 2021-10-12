@@ -59,7 +59,7 @@ namespace SoundProfiler2.Handler {
 
         public void Unregister() {
             if (!UnregisterHotKey(new WindowInteropHelper(view).Handle, GetHashCode())) {
-                throw new InvalidOperationException("HotKey could not be unregisted");
+                /* We don't care about failed unregistering */
             }
         }
         #endregion Public Methods
