@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 
 namespace SoundProfiler2.Views {
     /// <summary>

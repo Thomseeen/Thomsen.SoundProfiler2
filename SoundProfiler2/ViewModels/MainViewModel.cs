@@ -4,6 +4,10 @@ using SoundProfiler2.Handler;
 using SoundProfiler2.Models;
 using SoundProfiler2.Views;
 
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
+using System.Windows.Media;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,6 +40,8 @@ namespace SoundProfiler2.ViewModels {
 
         private readonly object mixerApplicationsLock = new();
         private readonly object mappingsLock = new();
+
+        private List<GlobalHotKeyHandler> globalKeybindingHandlers = new();
 
         private ProfileModel activeProfile;
         private ObservableCollection<ProfileModel> loadedProfiles;
@@ -131,10 +137,7 @@ namespace SoundProfiler2.ViewModels {
                 DataContext = this
             };
 
-            ApplyKeybindings();
-
-            refreshTimer.Elapsed += RefreshTimer_Elapsed;
-            refreshTimer.Start();
+            View.Loaded += View_Loaded;
         }
         #endregion Constructors
 
@@ -308,7 +311,9 @@ namespace SoundProfiler2.ViewModels {
                 /* Read old unchanged mappings from disk */
                 LoadedKeybindings = new ObservableCollection<KeybindingModel>(SettingsHandler.ReadSettings<KeybindingModel>(DEFAULT_KEYBINDINGS_FILEPATH));
             }
-            ApplyKeybindings();
+
+            //ApplyLocalKeybindings();
+            AppyGlobalKeybindings();
         }
 
         private void EditMappings() {
@@ -328,6 +333,14 @@ namespace SoundProfiler2.ViewModels {
         #endregion DialogHandling
 
         #region UI Handling
+        private void View_Loaded(object sender, RoutedEventArgs e) {
+            //ApplyLocalKeybindings();
+            AppyGlobalKeybindings();
+
+            refreshTimer.Elapsed += RefreshTimer_Elapsed;
+            refreshTimer.Start();
+        }
+
         private static void SetTextBoxFocusAndCursor(TextBox textBox, bool selectAll) {
             textBox.Focus();
             /* #BUG: Not working as intended */
@@ -339,7 +352,7 @@ namespace SoundProfiler2.ViewModels {
             GC.Collect();
         }
 
-        private void ApplyKeybindings() {
+        private void ApplyLocalKeybindings() {
             View.InputBindings.Clear();
 
             foreach (KeybindingModel keybinding in LoadedKeybindings) {
@@ -360,6 +373,26 @@ namespace SoundProfiler2.ViewModels {
                         )
                     );
                 }
+            }
+        }
+
+        private void AppyGlobalKeybindings() {
+            foreach (GlobalHotKeyHandler hotkey in globalKeybindingHandlers) {
+                hotkey.Dispose();
+            }
+
+            globalKeybindingHandlers.Clear();
+
+            foreach (KeybindingModel keybinding in LoadedKeybindings) {
+                GlobalHotKeyHandler hotKey = new(keybinding.Modifier, keybinding.Key);
+
+                if (keybinding is CategoryKeybindingModel catKeybinding) {
+                    hotKey.Register(View, KeybindableCommands[catKeybinding.Name], catKeybinding.CategoryName);
+                } else {
+                    hotKey.Register(View, KeybindableCommands[keybinding.Name]);
+                }
+
+                globalKeybindingHandlers.Add(hotKey);
             }
         }
         #endregion Private Methods
@@ -385,6 +418,10 @@ namespace SoundProfiler2.ViewModels {
                 if (disposing) {
                     refreshTimer.Stop();
                     refreshTimer.Dispose();
+
+                    foreach (GlobalHotKeyHandler hotkey in globalKeybindingHandlers) {
+                        hotkey.Dispose();
+                    }
                 }
 
                 SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
