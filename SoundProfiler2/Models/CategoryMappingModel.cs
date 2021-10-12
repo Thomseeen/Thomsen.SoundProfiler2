@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using Util.MVVM;
 
 namespace SoundProfiler2.Models {
-    public class CategoryMappingModel : BaseModel, ISetting {
+    public class CategoryMappingModel : BaseModel, IConfigurationCollection {
         #region Private Fields
         private string name;
         private ObservableCollection<ProgramModel> programs;

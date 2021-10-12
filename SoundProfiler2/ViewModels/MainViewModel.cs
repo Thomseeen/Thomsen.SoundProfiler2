@@ -27,26 +27,23 @@ using Util.MVVM;
 namespace SoundProfiler2.ViewModels {
     public class MainViewModel : BaseViewModel {
         #region Private Constants
-        private const string DEFAULT_PROFILES_FILEPATH = "profiles.json";
-        private const string DEFAULT_MAPPINGS_FILEPATH = "mappings.json";
-        private const string DEFAULT_KEYBINDINGS_FILEPATH = "keybindings.json";
+        private const string DEFAULT_CONFIGURATION_FILEPATH = "configuration.json";
 
         private const float DEFAULT_VOLUME_INC = 0.05f;
         #endregion Private Constants
 
         #region Private Fields
         private bool isDisposed = false;
-        private readonly Timer refreshTimer = new(100);
+        private readonly Timer refreshTimer = new(500);
 
         private readonly object mixerApplicationsLock = new();
         private readonly object mappingsLock = new();
 
-        private List<GlobalHotKeyHandler> globalKeybindingHandlers = new();
+        private readonly List<GlobalHotKeyHandler> globalKeybindingHandlers = new();
 
         private ProfileModel activeProfile;
-        private ObservableCollection<ProfileModel> loadedProfiles;
-        private ObservableCollection<CategoryMappingModel> loadedMappings;
-        private ObservableCollection<KeybindingModel> loadedKeybindings;
+
+        private SoundProfilerConfigurationModel loadedConfiguration;
         private ObservableCollection<MixerApplicationModel> mixerApplications = new();
 
         private bool isProfileNameEditing;
@@ -77,21 +74,32 @@ namespace SoundProfiler2.ViewModels {
             get => activeProfile;
             set { activeProfile = value; OnPropertyChanged(); }
         }
+
+        public SoundProfilerConfigurationModel LoadedConfiguration {
+            get => loadedConfiguration;
+            set {
+                loadedConfiguration = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LoadedProfiles));
+                OnPropertyChanged(nameof(LoadedMappings));
+                OnPropertyChanged(nameof(LoadedKeybindings));
+            }
+        }
         public ObservableCollection<ProfileModel> LoadedProfiles {
-            get => loadedProfiles;
-            set { loadedProfiles = value; OnPropertyChanged(); }
+            get => loadedConfiguration.Profiles;
+            set { loadedConfiguration.Profiles = value; OnPropertyChanged(); }
         }
         public ObservableCollection<CategoryMappingModel> LoadedMappings {
-            get => loadedMappings;
-            set { loadedMappings = value; OnPropertyChanged(); }
+            get => loadedConfiguration.Mappings;
+            set { loadedConfiguration.Mappings = value; OnPropertyChanged(); }
+        }
+        public ObservableCollection<KeybindingModel> LoadedKeybindings {
+            get => loadedConfiguration.Keybindings;
+            set { loadedConfiguration.Keybindings = value; OnPropertyChanged(); }
         }
         public ObservableCollection<MixerApplicationModel> MixerApplications {
             get => mixerApplications;
             set { mixerApplications = value; OnPropertyChanged(); }
-        }
-        public ObservableCollection<KeybindingModel> LoadedKeybindings {
-            get => loadedKeybindings;
-            set { loadedKeybindings = value; OnPropertyChanged(); }
         }
         public bool IsProfileNameEditing {
             get => isProfileNameEditing;
@@ -129,9 +137,7 @@ namespace SoundProfiler2.ViewModels {
 
         #region Constructors
         public MainViewModel() {
-            LoadedMappings = new ObservableCollection<CategoryMappingModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_MAPPINGS_FILEPATH, CategoryMappingModel.GetDefaultModels()));
-            LoadedProfiles = new ObservableCollection<ProfileModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_PROFILES_FILEPATH, ProfileModel.GetDefaultModels()));
-            LoadedKeybindings = new ObservableCollection<KeybindingModel>(SettingsHandler.ReadOrWriteDefaultSettings(DEFAULT_KEYBINDINGS_FILEPATH, KeybindingModel.GetDefaultModels()));
+            LoadedConfiguration = ConfigurationHandler.ReadOrWriteDefaultConfiguration(DEFAULT_CONFIGURATION_FILEPATH, SoundProfilerConfigurationModel.GetDefaultModel());
 
             View = new MainView {
                 DataContext = this
@@ -239,7 +245,7 @@ namespace SoundProfiler2.ViewModels {
                 ActiveProfile = newProfile;
             }
 
-            SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
+            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
 
             IsProfileNameEditing = true;
             SetTextBoxFocusAndCursor((View as MainView).profileRenameBox, true);
@@ -251,7 +257,7 @@ namespace SoundProfiler2.ViewModels {
                 ActiveProfile = LoadedProfiles.First();
             }
 
-            SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
+            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
         }
 
         private void BeginRenameProfile() {
@@ -261,7 +267,7 @@ namespace SoundProfiler2.ViewModels {
 
         private void EndRenameProfile() {
             IsProfileNameEditing = false;
-            SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
+            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
         }
 
         private void ProfileUp() {
@@ -306,10 +312,10 @@ namespace SoundProfiler2.ViewModels {
             if (result.HasValue && result.Value) {
                 /* Save changed mappings */
                 LoadedKeybindings = keybindingsDialog.LoadedKeybindings;
-                SettingsHandler.WriteSettings(LoadedKeybindings, DEFAULT_KEYBINDINGS_FILEPATH);
+                ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
             } else {
                 /* Read old unchanged mappings from disk */
-                LoadedKeybindings = new ObservableCollection<KeybindingModel>(SettingsHandler.ReadSettings<KeybindingModel>(DEFAULT_KEYBINDINGS_FILEPATH));
+                LoadedKeybindings = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(DEFAULT_CONFIGURATION_FILEPATH).Keybindings;
             }
 
             //ApplyLocalKeybindings();
@@ -323,10 +329,10 @@ namespace SoundProfiler2.ViewModels {
                 if (result.HasValue && result.Value) {
                     /* Save changed mappings */
                     LoadedMappings = mappingsDialog.LoadedMappings;
-                    SettingsHandler.WriteSettings(LoadedMappings, DEFAULT_MAPPINGS_FILEPATH);
+                    ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
                 } else {
                     /* Read old unchanged mappings from disk */
-                    LoadedMappings = new ObservableCollection<CategoryMappingModel>(SettingsHandler.ReadSettings<CategoryMappingModel>(DEFAULT_MAPPINGS_FILEPATH));
+                    LoadedMappings = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(DEFAULT_CONFIGURATION_FILEPATH).Mappings;
                 }
             }
         }
@@ -424,7 +430,7 @@ namespace SoundProfiler2.ViewModels {
                     }
                 }
 
-                SettingsHandler.WriteSettings(LoadedProfiles, DEFAULT_PROFILES_FILEPATH);
+                ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
 
                 isDisposed = true;
 

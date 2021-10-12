@@ -9,7 +9,7 @@ using System.Windows.Input;
 using Util.MVVM;
 
 namespace SoundProfiler2.Models {
-    public class KeybindingModel : BaseModel, ISetting {
+    public class KeybindingModel : BaseModel, IConfigurationCollection {
         #region Private Fields
         private string name;
 

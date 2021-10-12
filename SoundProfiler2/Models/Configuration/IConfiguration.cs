@@ -5,14 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoundProfiler2.Models {
-    public interface ISetting {
+    public interface IConfiguration {
         #region Public Properties
         public string Name { get; set; }
         #endregion Public Properties
 
         #region Public Methods
-        public static IEnumerable<ISetting> GetDefaultModels() {
-            return Array.Empty<ISetting>();
+        public static IConfiguration GetDefaultModel() {
+            return null;
         }
         #endregion Public Methods
     }
