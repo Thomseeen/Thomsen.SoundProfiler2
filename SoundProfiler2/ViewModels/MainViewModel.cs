@@ -29,7 +29,7 @@ namespace SoundProfiler2.ViewModels {
         #region Private Constants
         private const string DEFAULT_CONFIGURATION_FILEPATH = "configuration.json";
 
-        private const float DEFAULT_VOLUME_INC = 0.05f;
+        public const float DEFAULT_VOLUME_INC = 0.01f;
         #endregion Private Constants
 
         #region Private Fields
