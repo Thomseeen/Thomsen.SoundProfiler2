@@ -3,7 +3,7 @@
     <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net5.0-windows7.0</TargetFramework>
 
     <StartupObject>SoundProfiler2.App</StartupObject>
 

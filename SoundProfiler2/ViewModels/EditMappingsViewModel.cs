@@ -59,7 +59,7 @@ namespace SoundProfiler2.ViewModels {
         #endregion Constructors
 
         #region Private Methods
-        private void AddProgram(CategoryMappingModel mapping) {
+        private static void AddProgram(CategoryMappingModel mapping) {
             mapping.Programs.Add(new ProgramModel("newprog"));
         }
 
