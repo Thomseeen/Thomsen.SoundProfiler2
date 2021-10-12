@@ -83,19 +83,24 @@ namespace SoundProfiler2.ViewModels {
                 OnPropertyChanged(nameof(LoadedProfiles));
                 OnPropertyChanged(nameof(LoadedMappings));
                 OnPropertyChanged(nameof(LoadedKeybindings));
+                OnPropertyChanged(nameof(LoadedHiddenProgramsMapping));
             }
         }
+        public CategoryMappingModel LoadedHiddenProgramsMapping {
+            get => LoadedConfiguration.HiddenProgramsMapping;
+            set { LoadedConfiguration.HiddenProgramsMapping = value; OnPropertyChanged(); }
+        }
         public ObservableCollection<ProfileModel> LoadedProfiles {
-            get => loadedConfiguration.Profiles;
-            set { loadedConfiguration.Profiles = value; OnPropertyChanged(); }
+            get => LoadedConfiguration.Profiles;
+            set { LoadedConfiguration.Profiles = value; OnPropertyChanged(); }
         }
         public ObservableCollection<CategoryMappingModel> LoadedMappings {
-            get => loadedConfiguration.Mappings;
-            set { loadedConfiguration.Mappings = value; OnPropertyChanged(); }
+            get => LoadedConfiguration.Mappings;
+            set { LoadedConfiguration.Mappings = value; OnPropertyChanged(); }
         }
         public ObservableCollection<KeybindingModel> LoadedKeybindings {
-            get => loadedConfiguration.Keybindings;
-            set { loadedConfiguration.Keybindings = value; OnPropertyChanged(); }
+            get => LoadedConfiguration.Keybindings;
+            set { LoadedConfiguration.Keybindings = value; OnPropertyChanged(); }
         }
         public ObservableCollection<MixerApplicationModel> MixerApplications {
             get => mixerApplications;
@@ -155,8 +160,11 @@ namespace SoundProfiler2.ViewModels {
                 await Task.Run(() => {
                     /* Lock so multiple firing events don't overwrite each other, causing duplicate entries */
                     lock (mixerApplicationsLock) {
+                        /* Filter apps by hidden mapping */
+                        MixerApplicationModel[] newApps = FilterMixerApps(CoreAudioHandler.GetMixerApplications());
+
                         /* Only add new apps and refresh volume on old ones */
-                        MergeRefreshedAppsIntoActivesMixerApps(CoreAudioHandler.GetMixerApplications());
+                        MergeRefreshedAppsIntoActivesMixerApps(newApps);
 
                         /* Map application category */
                         if (LoadedMappings is not null) {
@@ -179,6 +187,10 @@ namespace SoundProfiler2.ViewModels {
             } catch (ObjectDisposedException) {
                 /* Closing */
             }
+        }
+
+        private MixerApplicationModel[] FilterMixerApps(MixerApplicationModel[] mixerApplications) {
+            return mixerApplications.Where(app => !LoadedHiddenProgramsMapping.Programs.Any(prog => app.UnifiedProcessName.Contains(prog.UnifiedName))).ToArray();
         }
 
         private void MergeRefreshedAppsIntoActivesMixerApps(MixerApplicationModel[] newMixerApplications) {
@@ -324,14 +336,16 @@ namespace SoundProfiler2.ViewModels {
 
         private void EditMappings() {
             lock (mappingsLock) {
-                using EditMappingsViewModel mappingsDialog = new(LoadedMappings);
+                using EditMappingsViewModel mappingsDialog = new(LoadedHiddenProgramsMapping, LoadedMappings);
                 bool? result = mappingsDialog.ShowDialog();
                 if (result.HasValue && result.Value) {
                     /* Save changed mappings */
+                    LoadedHiddenProgramsMapping = mappingsDialog.LoadedHiddenProgramsMapping;
                     LoadedMappings = mappingsDialog.LoadedMappings;
                     ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
                 } else {
                     /* Read old unchanged mappings from disk */
+                    LoadedHiddenProgramsMapping = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(DEFAULT_CONFIGURATION_FILEPATH).HiddenProgramsMapping;
                     LoadedMappings = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(DEFAULT_CONFIGURATION_FILEPATH).Mappings;
                 }
             }

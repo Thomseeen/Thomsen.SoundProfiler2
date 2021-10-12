@@ -8,7 +8,7 @@ using System.Reflection;
 <#+
 
  int major = 0;
- int minor = 3;
+ int minor = 4;
  
  static DateTime projectStartedDate = new DateTime(year: 2021, month: 8, day: 27);
 

@@ -14,6 +14,7 @@ using Util.MVVM;
 namespace SoundProfiler2.ViewModels {
     public class EditMappingsViewModel : BaseViewModel {
         #region Private Fields
+        private CategoryMappingModel loadedHiddenProgramsMapping;
         private ObservableCollection<CategoryMappingModel> loadedMappings;
 
         #region Commands
@@ -28,6 +29,10 @@ namespace SoundProfiler2.ViewModels {
         #region Public Properties
         public override string WindowTitle => $"Edit Mappings";
 
+        public CategoryMappingModel LoadedHiddenProgramsMapping {
+            get => loadedHiddenProgramsMapping;
+            set { loadedHiddenProgramsMapping = value; OnPropertyChanged(); }
+        }
         public ObservableCollection<CategoryMappingModel> LoadedMappings {
             get => loadedMappings;
             set { loadedMappings = value; OnPropertyChanged(); }
@@ -43,7 +48,8 @@ namespace SoundProfiler2.ViewModels {
         #endregion Public Properties
 
         #region Constructors
-        public EditMappingsViewModel(IEnumerable<CategoryMappingModel> mappings) {
+        public EditMappingsViewModel(CategoryMappingModel hiddenProgrammMapping, IEnumerable<CategoryMappingModel> mappings) {
+            LoadedHiddenProgramsMapping = hiddenProgrammMapping;
             LoadedMappings = new ObservableCollection<CategoryMappingModel>(mappings);
 
             View = new EditMappingsView {
@@ -58,7 +64,11 @@ namespace SoundProfiler2.ViewModels {
         }
 
         private void RemoveProgram(ProgramModel program) {
-            LoadedMappings.Single(mapping => mapping.Programs.Contains(program)).Programs.Remove(program);
+            if (LoadedHiddenProgramsMapping.Programs.Contains(program)) {
+                LoadedHiddenProgramsMapping.Programs.Remove(program);
+            } else {
+                LoadedMappings.Single(mapping => mapping.Programs.Contains(program)).Programs.Remove(program);
+            }
         }
         #endregion Private Methods
     }
