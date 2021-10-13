@@ -225,7 +225,11 @@ namespace SoundProfiler2.ViewModels {
                 } else {
 
                     SafeDispatcher.Invoke(() => {
-                        MixerApplications.Single(activeApp => activeApp.ProcessId == newApp.ProcessId).VolumeLevel = newApp.VolumeLevel;
+                        MixerApplicationModel oldApp = MixerApplications.Single(activeApp => activeApp.ProcessId == newApp.ProcessId);
+                        oldApp.VolumeLevel = newApp.VolumeLevel;
+                        oldApp.ApplicationIcon = newApp.ApplicationIcon;
+                        oldApp.FriendlyName = newApp.FriendlyName;
+                        oldApp.ProcessName = newApp.ProcessName;
                     });
                 }
             }
