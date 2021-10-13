@@ -23,6 +23,7 @@ using System.Windows.Input;
 
 using Util;
 using Util.MVVM;
+using SoundProfiler2.Properties;
 
 namespace SoundProfiler2.ViewModels {
     public class MainViewModel : BaseViewModel {
@@ -142,7 +143,20 @@ namespace SoundProfiler2.ViewModels {
 
         #region Constructors
         public MainViewModel() {
-            LoadedConfiguration = ConfigurationHandler.ReadOrWriteDefaultConfiguration(DEFAULT_CONFIGURATION_FILEPATH, SoundProfilerConfigurationModel.GetDefaultModel());
+            string configPath = Settings.Default.LastConfigPath;
+
+            if (!string.IsNullOrEmpty(configPath) && File.Exists(configPath)) {
+                LoadedConfiguration = ConfigurationHandler.ReadOrWriteDefaultConfiguration(configPath, SoundProfilerConfigurationModel.GetDefaultModel(configPath));
+            } else {
+                LoadedConfiguration = ConfigurationHandler.ReadOrWriteDefaultConfiguration(DEFAULT_CONFIGURATION_FILEPATH, SoundProfilerConfigurationModel.GetDefaultModel(DEFAULT_CONFIGURATION_FILEPATH));
+            }
+
+            string profileName = Settings.Default.LastProfileName;
+            if (!string.IsNullOrEmpty(profileName) && LoadedConfiguration.Profiles.Any(profile => profile.Name == profileName)) {
+                ActiveProfile = LoadedConfiguration.Profiles.Single(profile => profile.Name == profileName);
+            } else {
+                ActiveProfile = LoadedConfiguration.Profiles.First();
+            }
 
             View = new MainView {
                 DataContext = this
@@ -257,7 +271,7 @@ namespace SoundProfiler2.ViewModels {
                 ActiveProfile = newProfile;
             }
 
-            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
+            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, LoadedConfiguration.Path);
 
             IsProfileNameEditing = true;
             SetTextBoxFocusAndCursor((View as MainView).profileRenameBox, true);
@@ -269,7 +283,7 @@ namespace SoundProfiler2.ViewModels {
                 ActiveProfile = LoadedProfiles.First();
             }
 
-            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
+            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, LoadedConfiguration.Path);
         }
 
         private void BeginRenameProfile() {
@@ -279,7 +293,7 @@ namespace SoundProfiler2.ViewModels {
 
         private void EndRenameProfile() {
             IsProfileNameEditing = false;
-            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
+            ConfigurationHandler.WriteConfiguration(LoadedConfiguration, LoadedConfiguration.Path);
         }
 
         private void ProfileUp() {
@@ -324,10 +338,10 @@ namespace SoundProfiler2.ViewModels {
             if (result.HasValue && result.Value) {
                 /* Save changed mappings */
                 LoadedKeybindings = keybindingsDialog.LoadedKeybindings;
-                ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
+                ConfigurationHandler.WriteConfiguration(LoadedConfiguration, LoadedConfiguration.Path);
             } else {
                 /* Read old unchanged mappings from disk */
-                LoadedKeybindings = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(DEFAULT_CONFIGURATION_FILEPATH).Keybindings;
+                LoadedKeybindings = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(LoadedConfiguration.Path).Keybindings;
             }
 
             //ApplyLocalKeybindings();
@@ -342,11 +356,11 @@ namespace SoundProfiler2.ViewModels {
                     /* Save changed mappings */
                     LoadedHiddenProgramsMapping = mappingsDialog.LoadedHiddenProgramsMapping;
                     LoadedMappings = mappingsDialog.LoadedMappings;
-                    ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
+                    ConfigurationHandler.WriteConfiguration(LoadedConfiguration, LoadedConfiguration.Path);
                 } else {
                     /* Read old unchanged mappings from disk */
-                    LoadedHiddenProgramsMapping = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(DEFAULT_CONFIGURATION_FILEPATH).HiddenProgramsMapping;
-                    LoadedMappings = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(DEFAULT_CONFIGURATION_FILEPATH).Mappings;
+                    LoadedHiddenProgramsMapping = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(LoadedConfiguration.Path).HiddenProgramsMapping;
+                    LoadedMappings = ConfigurationHandler.ReadConfiguration<SoundProfilerConfigurationModel>(LoadedConfiguration.Path).Mappings;
                 }
             }
         }
@@ -444,7 +458,11 @@ namespace SoundProfiler2.ViewModels {
                     }
                 }
 
-                ConfigurationHandler.WriteConfiguration(LoadedConfiguration, DEFAULT_CONFIGURATION_FILEPATH);
+                ConfigurationHandler.WriteConfiguration(LoadedConfiguration, LoadedConfiguration.Path);
+
+                Settings.Default.LastConfigPath = LoadedConfiguration.Path;
+                Settings.Default.LastProfileName = ActiveProfile.Name;
+                Settings.Default.Save();
 
                 isDisposed = true;
 

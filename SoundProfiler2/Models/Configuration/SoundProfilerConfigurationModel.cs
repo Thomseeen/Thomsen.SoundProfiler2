@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Util.MVVM;
 
 namespace SoundProfiler2.Models {
     public class SoundProfilerConfigurationModel : BaseModel, IConfiguration {
         #region Private Fields
         private string name;
+        private string path;
 
         private ObservableCollection<ProfileModel> profiles;
         private ObservableCollection<CategoryMappingModel> mappings;
@@ -22,6 +24,10 @@ namespace SoundProfiler2.Models {
         public string Name {
             get => name;
             set { name = value; OnPropertyChanged(); }
+        }
+        public string Path {
+            get => path;
+            set { path = value; OnPropertyChanged(); }
         }
 
         public CategoryMappingModel HiddenProgramsMapping {
@@ -43,9 +49,10 @@ namespace SoundProfiler2.Models {
         #endregion Public properties
 
         #region Public Methods
-        public static SoundProfilerConfigurationModel GetDefaultModel() {
+        public static SoundProfilerConfigurationModel GetDefaultModel(string path) {
             return new SoundProfilerConfigurationModel {
                 Name = "default",
+                Path = path,
                 HiddenProgramsMapping = new CategoryMappingModel("Hidden", new ObservableCollection<ProgramModel>() {
                         new ProgramModel("rtx"),
                         new ProgramModel("explorer")
