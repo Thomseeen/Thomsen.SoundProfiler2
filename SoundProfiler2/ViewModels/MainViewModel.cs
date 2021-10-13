@@ -42,6 +42,8 @@ namespace SoundProfiler2.ViewModels {
 
         private readonly List<GlobalHotKeyHandler> globalKeybindingHandlers = new();
 
+        private string currentTime;
+
         private ProfileModel activeProfile;
 
         private SoundProfilerConfigurationModel loadedConfiguration;
@@ -71,6 +73,11 @@ namespace SoundProfiler2.ViewModels {
         #endregion Private Fields
 
         #region Public Properties
+        public string CurrentTime {
+            get => currentTime;
+            set { currentTime = value; OnPropertyChanged(); }
+        }
+
         public ProfileModel ActiveProfile {
             get => activeProfile;
             set { activeProfile = value; OnPropertyChanged(); }
@@ -434,6 +441,8 @@ namespace SoundProfiler2.ViewModels {
         #region Event Handler
         private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e) {
             RefreshAsync();
+
+            SafeDispatcher.Invoke(() => CurrentTime = DateTime.Now.ToString("H:mm"));
         }
 
         private void MixerApplication_PropertyChanged(object sender, PropertyChangedEventArgs e) {

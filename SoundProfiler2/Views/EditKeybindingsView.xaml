@@ -9,8 +9,6 @@
     xmlns:u="clr-namespace:Util"
     Name="Window"
     Title="{Binding WindowTitle}"
-    Width="600"
-    Height="400"
     d:DataContext="{d:DesignInstance Type=local:EditKeybindingsViewModel}"
     Icon="/Resources/icon.ico"
     ResizeMode="NoResize"

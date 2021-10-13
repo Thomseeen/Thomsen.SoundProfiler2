@@ -7,8 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Name="Window"
     Title="{Binding WindowTitle}"
-    Width="600"
-    Height="400"
     d:DataContext="{d:DesignInstance Type=local:EditMappingsViewModel}"
     Icon="/Resources/icon.ico"
     ResizeMode="NoResize"
