@@ -1,5 +1,4 @@
 ﻿using SoundProfiler2.ViewModels;
-using SoundProfiler2.Views;
 
 using System;
 using System.IO;

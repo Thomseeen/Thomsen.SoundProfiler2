@@ -3,7 +3,7 @@
     <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
 
     <StartupObject>SoundProfiler2.App</StartupObject>
 
@@ -34,7 +34,7 @@
     <DefineConstants>DEBUG</DefineConstants>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\TextTemplating\Microsoft.TextTemplating.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\TextTemplating\Microsoft.TextTemplating.targets" />
 
   <Import Project="..\Util\Util.projitems" Label="Shared" />
   <ItemGroup>

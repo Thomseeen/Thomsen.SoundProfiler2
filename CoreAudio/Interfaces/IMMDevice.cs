@@ -22,16 +22,14 @@ using System.Runtime.InteropServices;
 using Vannatech.CoreAudio.Constants;
 using Vannatech.CoreAudio.Externals;
 
-namespace Vannatech.CoreAudio.Interfaces
-{
+namespace Vannatech.CoreAudio.Interfaces {
     /// <summary>
     /// Represents an audio device.
     /// </summary>
     /// <remarks>
     /// MSDN Reference: http://msdn.microsoft.com/en-us/library/dd371395.aspx
     /// </remarks>
-    public partial interface IMMDevice
-    {
+    public partial interface IMMDevice {
         /// <summary>
         /// Creates a COM object with the specified interface.
         /// </summary>
@@ -42,10 +40,10 @@ namespace Vannatech.CoreAudio.Interfaces
         /// <returns>An HRESULT code indicating whether the operation passed of failed.</returns>
         [PreserveSig]
         int Activate(
-			[In] [MarshalAs(UnmanagedType.LPStruct)] Guid interfaceId,
-            [In] [MarshalAs(UnmanagedType.U4)] UInt32 classContext,
-            [In, Optional] IntPtr activationParams, // TODO: Update to use PROPVARIANT and test properly.
-			[Out] [MarshalAs(UnmanagedType.IUnknown)] out object instancePtr);
+            [In][MarshalAs(UnmanagedType.LPStruct)] Guid interfaceId,
+            [In][MarshalAs(UnmanagedType.U4)] UInt32 classContext,
+            [In, Optional] IntPtr activationParams, // ETODO: Update to use PROPVARIANT and test properly.
+            [Out][MarshalAs(UnmanagedType.IUnknown)] out object instancePtr);
 
         /// <summary>
         /// Gets an interface to the device's property store.
@@ -58,8 +56,8 @@ namespace Vannatech.CoreAudio.Interfaces
         /// </remarks>
         [PreserveSig]
         int OpenPropertyStore(
-			[In] [MarshalAs(UnmanagedType.U4)] UInt32 accessMode,
-            [Out] [MarshalAs(UnmanagedType.Interface)] out IPropertyStore properties);
+            [In][MarshalAs(UnmanagedType.U4)] UInt32 accessMode,
+            [Out][MarshalAs(UnmanagedType.Interface)] out IPropertyStore properties);
 
         /// <summary>
         /// Retrieves an endpoint ID string that identifies the audio endpoint device.
@@ -68,7 +66,7 @@ namespace Vannatech.CoreAudio.Interfaces
         /// <returns>An HRESULT code indicating whether the operation passed of failed.</returns>
         [PreserveSig]
         int GetId(
-            [Out] [MarshalAs(UnmanagedType.LPWStr)] out string strId);
+            [Out][MarshalAs(UnmanagedType.LPWStr)] out string strId);
 
         /// <summary>
         /// Gets the current state of the device.
@@ -77,6 +75,6 @@ namespace Vannatech.CoreAudio.Interfaces
         /// <returns>An HRESULT code indicating whether the operation passed of failed.</returns>
         [PreserveSig]
         int GetState(
-			[Out] [MarshalAs(UnmanagedType.U4)] out UInt32 deviceState);
+            [Out][MarshalAs(UnmanagedType.U4)] out UInt32 deviceState);
     }
 }

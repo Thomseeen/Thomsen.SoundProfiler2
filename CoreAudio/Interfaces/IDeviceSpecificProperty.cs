@@ -20,16 +20,14 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Vannatech.CoreAudio.Interfaces
-{
+namespace Vannatech.CoreAudio.Interfaces {
     /// <summary>
 	/// Provides access to the control value of a device-specific hardware control.
     /// </summary>
     /// <remarks>
 	/// MSDN Reference: http://msdn.microsoft.com/en-us/library/dd371121.aspx
     /// </remarks>
-	public partial interface IDeviceSpecificProperty
-    {
+	public partial interface IDeviceSpecificProperty {
         /// <summary>
         /// Gets the data type of the device-specific property.
         /// </summary>
@@ -37,7 +35,7 @@ namespace Vannatech.CoreAudio.Interfaces
         /// <returns>An HRESULT code indicating whether the operation succeeded of failed.</returns>
         [PreserveSig]
         int GetType(
-            [Out] [MarshalAs(UnmanagedType.SysInt)] out IntPtr dataType); // TODO: Fix this, C++ is (VARTYPE *)
+            [Out][MarshalAs(UnmanagedType.SysInt)] out IntPtr dataType); // ETODO: Fix this, C++ is (VARTYPE *)
 
         /// <summary>
         /// Gets the value of the device-specific property.
@@ -47,8 +45,8 @@ namespace Vannatech.CoreAudio.Interfaces
         /// <returns>An HRESULT code indicating whether the operation succeeded of failed.</returns>
         [PreserveSig]
         int GetValue(
-			[Out] [MarshalAs(UnmanagedType.SysInt)] out IntPtr propertyValue,
-			[In, Out] [MarshalAs(UnmanagedType.U4)] ref UInt32 propertySize);
+            [Out][MarshalAs(UnmanagedType.SysInt)] out IntPtr propertyValue,
+            [In, Out][MarshalAs(UnmanagedType.U4)] ref UInt32 propertySize);
 
         /// <summary>
         /// Sets the value of the device-specific property.
@@ -59,22 +57,22 @@ namespace Vannatech.CoreAudio.Interfaces
         /// <returns>An HRESULT code indicating whether the operation succeeded of failed.</returns>
         [PreserveSig]
         int SetValue(
-            [In] [MarshalAs(UnmanagedType.SysInt)] IntPtr propertyValue,
-            [In] [MarshalAs(UnmanagedType.U4)] UInt32 propertySize,
-            [In, Optional] [MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
+            [In][MarshalAs(UnmanagedType.SysInt)] IntPtr propertyValue,
+            [In][MarshalAs(UnmanagedType.U4)] UInt32 propertySize,
+            [In, Optional][MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
 
-		/// <summary>
-		/// Gets the 4-byte range of the device-specific property.
-		/// </summary>
-		/// <param name="propertyMin">Receives the minimum property value.</param>
-		/// <param name="propertyMax">Receives the maximum property value.</param>
-		/// <param name="propertyInc">Receives the stepping value between consecutive property values in the range.</param>
-		/// <returns>An HRESULT code indicating whether the operation succeeded of failed.</returns>
-		[PreserveSig]
-		int Get4BRange(
-			[Out] [MarshalAs(UnmanagedType.I4)] out Int32 propertyMin,
-			[Out] [MarshalAs(UnmanagedType.I4)] out Int32 propertyMax,
-			[Out] [MarshalAs(UnmanagedType.I4)] out Int32 propertyInc);
+        /// <summary>
+        /// Gets the 4-byte range of the device-specific property.
+        /// </summary>
+        /// <param name="propertyMin">Receives the minimum property value.</param>
+        /// <param name="propertyMax">Receives the maximum property value.</param>
+        /// <param name="propertyInc">Receives the stepping value between consecutive property values in the range.</param>
+        /// <returns>An HRESULT code indicating whether the operation succeeded of failed.</returns>
+        [PreserveSig]
+        int Get4BRange(
+            [Out][MarshalAs(UnmanagedType.I4)] out Int32 propertyMin,
+            [Out][MarshalAs(UnmanagedType.I4)] out Int32 propertyMax,
+            [Out][MarshalAs(UnmanagedType.I4)] out Int32 propertyInc);
 
     }
 }

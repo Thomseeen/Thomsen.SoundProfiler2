@@ -1,29 +1,21 @@
-﻿using Newtonsoft.Json;
-
+﻿
 using SoundProfiler2.Handler;
 using SoundProfiler2.Models;
+using SoundProfiler2.Properties;
 using SoundProfiler2.Views;
-
-using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using System.Windows.Media;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
 using Util;
 using Util.MVVM;
-using SoundProfiler2.Properties;
 
 namespace SoundProfiler2.ViewModels {
     public class MainViewModel : BaseViewModel {
@@ -393,7 +385,7 @@ namespace SoundProfiler2.ViewModels {
         }
         #endregion
 
-        private void Test(object param) {
+        private static void Test(object param) {
             GC.Collect();
         }
 
@@ -446,7 +438,7 @@ namespace SoundProfiler2.ViewModels {
         private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e) {
             RefreshAsync();
 
-            SafeDispatcher.Invoke(() => CurrentTime = DateTime.Now.ToString("H:mm"));
+            SafeDispatcher.Invoke(() => CurrentTime = DateTime.Now.ToString("H:mm d.M.yyyy"));
         }
 
         private void MixerApplication_PropertyChanged(object sender, PropertyChangedEventArgs e) {
