@@ -9,20 +9,20 @@ using Util.MVVM;
 namespace Thomsen.SoundProfiler2.Models {
     public class ProfileModel : BaseModel, IConfigurationCollection {
         #region Private Fields
-        private string name;
+        private string _name;
 
-        private ObservableCollection<CategoryVolumeModel> categoryVolumes;
+        private ObservableCollection<CategoryVolumeModel> _categoryVolumes;
         #endregion Private Fields
 
         #region Public Properties
         public string Name {
-            get => name;
-            set { name = value; OnPropertyChanged(); }
+            get => _name;
+            set { _name = value; OnPropertyChanged(); }
         }
 
         public ObservableCollection<CategoryVolumeModel> CategoryVolumes {
-            get => categoryVolumes;
-            set { categoryVolumes = value; OnPropertyChanged(); }
+            get => _categoryVolumes;
+            set { _categoryVolumes = value; OnPropertyChanged(); }
         }
         #endregion Public Properties
 

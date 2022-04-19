@@ -13,32 +13,32 @@ namespace Thomsen.SoundProfiler2.Models {
         #endregion Public Constants
 
         #region Private Fields
-        private int processId;
-        private string deviceName;
-        private string friendlyName;
-        private string processName;
-        private Icon applicationIcon;
+        private int _processId;
+        private string _deviceName;
+        private string _friendlyName;
+        private string _processName;
+        private Icon _applicationIcon;
 
-        private string category;
+        private string _category;
 
-        private float volumeLevel;
+        private float _volumeLevel;
         #endregion Private Fields
 
         #region Public Properties
         public int ProcessId {
-            get => processId;
-            set { processId = value; OnPropertyChanged(); }
+            get => _processId;
+            set { _processId = value; OnPropertyChanged(); }
         }
 
         public string DeviceName {
-            get => deviceName;
-            set { deviceName = value; OnPropertyChanged(); }
+            get => _deviceName;
+            set { _deviceName = value; OnPropertyChanged(); }
         }
 
         public string ProcessName {
-            get => processName;
+            get => _processName;
             set {
-                processName = value;
+                _processName = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(UnifiedProcessName));
             }
@@ -47,14 +47,14 @@ namespace Thomsen.SoundProfiler2.Models {
         public string UnifiedProcessName => ProcessName.ToLowerInvariant().Replace(" ", "");
 
         public string FriendlyName {
-            get => friendlyName;
-            set { friendlyName = value; OnPropertyChanged(); }
+            get => _friendlyName;
+            set { _friendlyName = value; OnPropertyChanged(); }
         }
 
         public Icon ApplicationIcon {
-            get => applicationIcon;
+            get => _applicationIcon;
             set {
-                applicationIcon = value;
+                _applicationIcon = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ApplicationIconBitmapSource));
             }
@@ -63,17 +63,17 @@ namespace Thomsen.SoundProfiler2.Models {
         public BitmapSource ApplicationIconBitmapSource => Imaging.CreateBitmapSourceFromHIcon(ApplicationIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         public string Category {
-            get => category;
+            get => _category;
             set {
-                category = value;
+                _category = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsVolumeEditable));
             }
         }
 
         public float VolumeLevel {
-            get => volumeLevel;
-            set { volumeLevel = value; OnPropertyChanged(); }
+            get => _volumeLevel;
+            set { _volumeLevel = value; OnPropertyChanged(); }
         }
 
         public bool IsVolumeEditable => Category == UNMAPPED_CATEGORY;

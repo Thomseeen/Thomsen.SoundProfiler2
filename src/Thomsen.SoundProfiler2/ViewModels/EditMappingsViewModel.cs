@@ -11,15 +11,15 @@ using Util.MVVM;
 namespace Thomsen.SoundProfiler2.ViewModels {
     public class EditMappingsViewModel : BaseViewModel {
         #region Private Fields
-        private CategoryMappingModel loadedHiddenProgramsMapping;
-        private ObservableCollection<CategoryMappingModel> loadedMappings;
+        private CategoryMappingModel _loadedHiddenProgramsMapping;
+        private ObservableCollection<CategoryMappingModel> _loadedMappings;
 
         #region Commands
-        private ICommand addProgramCommand;
-        private ICommand removeProgramCommand;
+        private ICommand _addProgramCommand;
+        private ICommand _removeProgramCommand;
 
-        private ICommand closeCommand;
-        private ICommand saveCommand;
+        private ICommand _closeCommand;
+        private ICommand _saveCommand;
         #endregion Commands
         #endregion Private Fields
 
@@ -27,20 +27,20 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         public override string WindowTitle => $"Edit Mappings";
 
         public CategoryMappingModel LoadedHiddenProgramsMapping {
-            get => loadedHiddenProgramsMapping;
-            set { loadedHiddenProgramsMapping = value; OnPropertyChanged(); }
+            get => _loadedHiddenProgramsMapping;
+            set { _loadedHiddenProgramsMapping = value; OnPropertyChanged(); }
         }
         public ObservableCollection<CategoryMappingModel> LoadedMappings {
-            get => loadedMappings;
-            set { loadedMappings = value; OnPropertyChanged(); }
+            get => _loadedMappings;
+            set { _loadedMappings = value; OnPropertyChanged(); }
         }
 
         #region Commands
-        public ICommand AddProgramCommand => addProgramCommand ??= new CommandHandler(param => AddProgram(param as CategoryMappingModel), () => true);
-        public ICommand RemoveProgramCommand => removeProgramCommand ??= new CommandHandler(param => RemoveProgram(param as ProgramModel), () => true);
+        public ICommand AddProgramCommand => _addProgramCommand ??= new CommandHandler(param => AddProgram(param as CategoryMappingModel), () => true);
+        public ICommand RemoveProgramCommand => _removeProgramCommand ??= new CommandHandler(param => RemoveProgram(param as ProgramModel), () => true);
 
-        public ICommand CloseCommand => closeCommand ??= new CommandHandler(param => ExitDialog(false), () => true);
-        public ICommand SaveCommand => saveCommand ??= new CommandHandler(param => ExitDialog(true), () => true);
+        public ICommand CloseCommand => _closeCommand ??= new CommandHandler(param => ExitDialog(false), () => true);
+        public ICommand SaveCommand => _saveCommand ??= new CommandHandler(param => ExitDialog(true), () => true);
         #endregion Commands
         #endregion Public Properties
 

@@ -4,20 +4,20 @@ using Util.MVVM;
 namespace Thomsen.SoundProfiler2.Models {
     public class CategoryVolumeModel : BaseModel {
         #region Private Fields
-        private string name;
+        private string _name;
 
-        private float volume;
+        private float _volume;
         #endregion Private Fields
 
         #region Public Properties
         public string Name {
-            get => name;
-            set { name = value; OnPropertyChanged(); }
+            get => _name;
+            set { _name = value; OnPropertyChanged(); }
         }
 
         public float Volume {
-            get => volume;
-            set { volume = value < 0 ? 0 : value > 1 ? 1 : value; OnPropertyChanged(); }
+            get => _volume;
+            set { _volume = value < 0 ? 0 : value > 1 ? 1 : value; OnPropertyChanged(); }
         }
         #endregion Public Properties
 

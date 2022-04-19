@@ -5,41 +5,41 @@ using Util.MVVM;
 namespace Thomsen.SoundProfiler2.Models.Configuration {
     public class SoundProfilerConfigurationModel : BaseModel, IConfiguration {
         #region Private Fields
-        private string name;
-        private string path;
+        private string _name;
+        private string _path;
 
-        private ObservableCollection<ProfileModel> profiles;
-        private ObservableCollection<CategoryMappingModel> mappings;
-        private ObservableCollection<KeybindingModel> keybindings;
+        private ObservableCollection<ProfileModel> _profiles;
+        private ObservableCollection<CategoryMappingModel> _mappings;
+        private ObservableCollection<KeybindingModel> _keybindings;
 
-        private CategoryMappingModel hiddenProgramsMapping;
+        private CategoryMappingModel _hiddenProgramsMapping;
         #endregion Private Fields
 
         #region Public Properties
         public string Name {
-            get => name;
-            set { name = value; OnPropertyChanged(); }
+            get => _name;
+            set { _name = value; OnPropertyChanged(); }
         }
         public string Path {
-            get => path;
-            set { path = value; OnPropertyChanged(); }
+            get => _path;
+            set { _path = value; OnPropertyChanged(); }
         }
 
         public CategoryMappingModel HiddenProgramsMapping {
-            get => hiddenProgramsMapping;
-            set { hiddenProgramsMapping = value; OnPropertyChanged(); }
+            get => _hiddenProgramsMapping;
+            set { _hiddenProgramsMapping = value; OnPropertyChanged(); }
         }
         public ObservableCollection<ProfileModel> Profiles {
-            get => profiles;
-            set { profiles = value; OnPropertyChanged(); }
+            get => _profiles;
+            set { _profiles = value; OnPropertyChanged(); }
         }
         public ObservableCollection<CategoryMappingModel> Mappings {
-            get => mappings;
-            set { mappings = value; OnPropertyChanged(); }
+            get => _mappings;
+            set { _mappings = value; OnPropertyChanged(); }
         }
         public ObservableCollection<KeybindingModel> Keybindings {
-            get => keybindings;
-            set { keybindings = value; OnPropertyChanged(); }
+            get => _keybindings;
+            set { _keybindings = value; OnPropertyChanged(); }
         }
         #endregion Public properties
 

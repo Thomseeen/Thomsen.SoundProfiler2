@@ -42,7 +42,7 @@ namespace Thomsen.SoundProfiler2.Handler {
                         try {
                             icon = Icon.ExtractAssociatedIcon(process.MainModule.FileName);
                         } catch (Win32Exception) {
-                            icon = Resources.Win32Project_16x_ico;
+                            icon = Resources.icon1;
                         }
 
                         mixerApplications.Add(new MixerApplicationModel() {

@@ -16,7 +16,7 @@ namespace SoundProfiler2 {
     /// </summary>
     public partial class App : Application {
         #region Private Fields
-        private BaseViewModel viewModel;
+        private BaseViewModel _viewModel;
         #endregion Private Fields
 
         #region Application Overrides
@@ -27,14 +27,14 @@ namespace SoundProfiler2 {
             DispatcherUnhandledException += Dispatcher_UnhandledException;
             TaskScheduler.UnobservedTaskException += Task_UnhandledException;
 
-            viewModel = new MainViewModel();
-            viewModel.Show();
+            _viewModel = new MainViewModel();
+            _viewModel.Show();
         }
 
         protected override void OnExit(ExitEventArgs e) {
             base.OnExit(e);
 
-            viewModel.Dispose();
+            _viewModel.Dispose();
         }
         #endregion Application Overrides
 

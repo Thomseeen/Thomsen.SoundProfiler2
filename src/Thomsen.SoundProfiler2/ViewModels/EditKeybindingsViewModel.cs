@@ -10,11 +10,11 @@ using Util.MVVM;
 namespace Thomsen.SoundProfiler2.ViewModels {
     public class EditKeybindingsViewModel : BaseViewModel {
         #region Private Fields
-        private ObservableCollection<KeybindingModel> loadedKeybindings;
+        private ObservableCollection<KeybindingModel> _loadedKeybindings;
 
         #region Commands
-        private ICommand closeCommand;
-        private ICommand saveCommand;
+        private ICommand _closeCommand;
+        private ICommand _saveCommand;
         #endregion Commands
         #endregion Private Fields
 
@@ -22,13 +22,13 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         public override string WindowTitle => $"Edit Keybindings";
 
         public ObservableCollection<KeybindingModel> LoadedKeybindings {
-            get => loadedKeybindings;
-            set { loadedKeybindings = value; OnPropertyChanged(); }
+            get => _loadedKeybindings;
+            set { _loadedKeybindings = value; OnPropertyChanged(); }
         }
 
         #region Commands
-        public ICommand CloseCommand => closeCommand ??= new CommandHandler(param => ExitDialog(false), () => true);
-        public ICommand SaveCommand => saveCommand ??= new CommandHandler(param => ExitDialog(true), () => true);
+        public ICommand CloseCommand => _closeCommand ??= new CommandHandler(param => ExitDialog(false), () => true);
+        public ICommand SaveCommand => _saveCommand ??= new CommandHandler(param => ExitDialog(true), () => true);
         #endregion Commands
         #endregion Public Properties
 

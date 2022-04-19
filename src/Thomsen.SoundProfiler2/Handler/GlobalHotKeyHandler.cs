@@ -9,9 +9,9 @@ namespace Thomsen.SoundProfiler2.Handler {
     public class GlobalHotKeyHandler : IDisposable {
         #region WinAPI
         [DllImport("user32.dll")]
-        public static extern bool RegisterHotKey(IntPtr hWnd, int id, int mod, int key);
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, int mod, int key);
         [DllImport("user32.dll")]
-        public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
         #endregion WinAPI
 
         #region Private Constants
@@ -19,29 +19,29 @@ namespace Thomsen.SoundProfiler2.Handler {
         #endregion Private Constants
 
         #region Private Fields
-        private ModifierKeys modifier;
-        private Key key;
+        private readonly ModifierKeys _modifier;
+        private readonly Key _key;
 
-        private Window view;
+        private Window _view;
 
-        private ICommand command;
-        private object commandParameter;
+        private ICommand _command;
+        private object _commandParameter;
 
         private bool isDisposed;
         #endregion Private Fields
 
         #region Constructor
         public GlobalHotKeyHandler(ModifierKeys modifier, Key key) {
-            this.modifier = modifier;
-            this.key = key;
+            _modifier = modifier;
+            _key = key;
         }
         #endregion Constructor
 
         #region Public Methods
         public void Register(Window view, ICommand command, object commandParameter = null) {
-            this.command = command;
-            this.commandParameter = commandParameter;
-            this.view = view;
+            _command = command;
+            _commandParameter = commandParameter;
+            _view = view;
 
             if (PresentationSource.FromVisual(view) is not HwndSource source) {
                 throw new InvalidOperationException("No source could be created from the view");
@@ -49,13 +49,13 @@ namespace Thomsen.SoundProfiler2.Handler {
 
             source.AddHook(WndProc);
 
-            if (!RegisterHotKey(new WindowInteropHelper(view).Handle, GetHashCode(), (int)modifier, KeyInterop.VirtualKeyFromKey(key))) {
+            if (!RegisterHotKey(new WindowInteropHelper(view).Handle, GetHashCode(), (int)_modifier, KeyInterop.VirtualKeyFromKey(_key))) {
                 throw new InvalidOperationException("HotKey could not be registed");
             }
         }
 
         public void Unregister() {
-            if (!UnregisterHotKey(new WindowInteropHelper(view).Handle, GetHashCode())) {
+            if (!UnregisterHotKey(new WindowInteropHelper(_view).Handle, GetHashCode())) {
                 /* We don't care about failed unregistering */
             }
         }
@@ -72,8 +72,8 @@ namespace Thomsen.SoundProfiler2.Handler {
                 ModifierKeys modifier = (ModifierKeys)rawMod;
                 Key key = KeyInterop.KeyFromVirtualKey(rawKey);
 
-                if (modifier == this.modifier && key == this.key) {
-                    command.Execute(commandParameter);
+                if (modifier == _modifier && key == _key) {
+                    _command.Execute(_commandParameter);
                 }
             }
 

@@ -4,14 +4,14 @@ using Util.MVVM;
 namespace Thomsen.SoundProfiler2.Models {
     public class ProgramModel : BaseModel {
         #region Private Fields
-        private string name;
+        private string _name;
         #endregion Private Fields
 
         #region Public Properties
         public string Name {
-            get => name;
+            get => _name;
             set {
-                name = value;
+                _name = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(UnifiedName));
             }

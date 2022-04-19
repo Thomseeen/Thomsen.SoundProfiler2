@@ -7,26 +7,26 @@ using Util.MVVM;
 namespace Thomsen.SoundProfiler2.Models {
     public class KeybindingModel : BaseModel, IConfigurationCollection {
         #region Private Fields
-        private string name;
+        private string _name;
 
-        private Key key;
-        private ModifierKeys modifier;
+        private Key _key;
+        private ModifierKeys _modifier;
         #endregion Private Fields
 
         #region Public Properties
         public string Name {
-            get => name;
-            set { name = value; OnPropertyChanged(); }
+            get => _name;
+            set { _name = value; OnPropertyChanged(); }
         }
 
         public Key Key {
-            get => key;
-            set { key = value; OnPropertyChanged(); }
+            get => _key;
+            set { _key = value; OnPropertyChanged(); }
         }
 
         public ModifierKeys Modifier {
-            get => modifier;
-            set { modifier = value; OnPropertyChanged(); }
+            get => _modifier;
+            set { _modifier = value; OnPropertyChanged(); }
         }
         #endregion Public Properties
 
@@ -102,13 +102,13 @@ namespace Thomsen.SoundProfiler2.Models {
 
     public class CategoryKeybindingModel : KeybindingModel {
         #region Private Fields
-        private string categoryName;
+        private string _categoryName;
         #endregion Private Fields
 
         #region Public Properties
         public string CategoryName {
-            get => categoryName;
-            set { categoryName = value; OnPropertyChanged(); }
+            get => _categoryName;
+            set { _categoryName = value; OnPropertyChanged(); }
         }
         #endregion Public Properties
 
