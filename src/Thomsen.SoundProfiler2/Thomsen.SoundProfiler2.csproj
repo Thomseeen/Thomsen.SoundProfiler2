@@ -1,0 +1,125 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <Platforms>x64</Platforms>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+
+    <StartupObject>SoundProfiler2.App</StartupObject>
+
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TransformOnBuild>true</TransformOnBuild>
+    <OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    <SignAssembly>false</SignAssembly>
+    <Authors>Thomas Wagner</Authors>
+    <Company>Thomas Wagner</Company>
+    <Copyright>Copyright (c) 2022 Thomas Wagner</Copyright>
+    <RepositoryUrl>https://github.com/Thomseeen/SoundProfiler2</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Thomseeen/SoundProfiler2</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseFile>..\..\LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\TextTemplating\Microsoft.TextTemplating.targets" />
+
+  <Import Project="..\Util\Util.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\Vannatech.CoreAudio\Vannatech.CoreAudio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="VersionAutoIncrement.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>VersionAutoIncrement.cs</LastGenOutput>
+    </None>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Update="VersionAutoIncrement.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VersionAutoIncrement.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Add_16x.png" />
+    <None Remove="Resources\Choose_16x.png" />
+    <None Remove="Resources\Exit_16x.png" />
+    <None Remove="Resources\icon.ico" />
+    <None Remove="Resources\icon.png" />
+    <None Remove="Resources\NewFile_16x.png" />
+    <None Remove="Resources\OpenFile_16x.png" />
+    <None Remove="Resources\Refresh_16x.png" />
+    <None Remove="Resources\Remove_color_16x.png" />
+    <None Remove="Resources\Rename_16x.png" />
+    <None Remove="Resources\Save_16x.png" />
+    <None Remove="Resources\Test_16x.png" />
+    <None Remove="Resources\ToggleOfficeKeyboardScheme_16x.png" />
+    <None Remove="Resources\Win32Project_16x.ico" />
+    <None Remove="Resources\Win32Project_16x.png" />
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="Resources\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Add_16x.png" />
+    <Resource Include="Resources\Choose_16x.png" />
+    <Resource Include="Resources\Exit_16x.png" />
+    <Resource Include="Resources\icon.ico" />
+    <Resource Include="Resources\icon.png" />
+    <Resource Include="Resources\NewFile_16x.png" />
+    <Resource Include="Resources\OpenFile_16x.png" />
+    <Resource Include="Resources\Refresh_16x.png" />
+    <Resource Include="Resources\Remove_color_16x.png" />
+    <Resource Include="Resources\Rename_16x.png" />
+    <Resource Include="Resources\Save_16x.png" />
+    <Resource Include="Resources\Test_16x.png" />
+    <Resource Include="Resources\ToggleOfficeKeyboardScheme_16x.png" />
+    <Resource Include="Resources\Win32Project_16x.ico" />
+    <Resource Include="Resources\Win32Project_16x.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+</Project>
