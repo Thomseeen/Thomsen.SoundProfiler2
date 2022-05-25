@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -29,7 +30,8 @@ namespace Thomsen.SoundProfiler2.ViewModels {
 
         #region Private Fields
         private bool _disposed = false;
-        private readonly Timer _refreshTimer = new(500);
+        private bool _shutingDown = false;
+        private readonly System.Timers.Timer _refreshTimer = new(500);
 
         private readonly object _mixerApplicationsLock = new();
         private readonly object _mappingsLock = new();
@@ -185,6 +187,12 @@ namespace Thomsen.SoundProfiler2.ViewModels {
                 await Task.Run(() => {
                     /* Lock so multiple firing events don't overwrite each other, causing duplicate entries */
                     lock (_mixerApplicationsLock) {
+
+                        /* Don't do anything if we are shutting down */
+                        if (_shutingDown) {
+                            return;
+                        }
+
                         /* Filter apps by hidden mapping */
                         MixerApplicationModel[] newApps = FilterMixerApps(CoreAudioHandler.GetMixerApplications());
 
@@ -449,6 +457,9 @@ namespace Thomsen.SoundProfiler2.ViewModels {
 
         #region BaseViewModel
         protected override void Dispose(bool disposing) {
+            _shutingDown = true;
+            Thread.Sleep(100);
+
             if (!_disposed) {
                 if (disposing) {
                     _refreshTimer.Stop();

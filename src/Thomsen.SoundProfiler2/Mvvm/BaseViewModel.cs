@@ -47,11 +47,13 @@ namespace Thomsen.WpfTools.Mvvm {
         }
 
         public bool? ShowDialog() {
-            if (_view is null) {
-                _view = new T {
-                    DataContext = this
-                };
+            if (_view is not null) {
+                throw new InvalidOperationException("ShowDialog can only be called once.");
             }
+
+            _view = new T {
+                DataContext = this
+            };
 
             _view.Loaded += View_Loaded;
 
