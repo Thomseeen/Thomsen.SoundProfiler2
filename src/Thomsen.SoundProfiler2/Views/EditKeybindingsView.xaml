@@ -32,13 +32,13 @@
                         <ComboBox
                             Grid.Column="1"
                             Margin="2"
-                            ItemsSource="{Binding Source={u:EnumBindingSourceExtension`1 {x:Type ModifierKeys}}}"
+                            ItemsSource="{Binding Source={u:EnumBindingSource {x:Type ModifierKeys}}}"
                             SelectedValue="{Binding Modifier}" />
 
                         <ComboBox
                             Grid.Column="2"
                             Margin="2"
-                            ItemsSource="{Binding Source={u:EnumBindingSourceExtension`1 {x:Type Key}}}"
+                            ItemsSource="{Binding Source={u:EnumBindingSource {x:Type Key}}}"
                             SelectedValue="{Binding Key}" />
                     </Grid>
                 </DataTemplate>

@@ -32,7 +32,7 @@ namespace Thomsen.SoundProfiler2.Handler {
                 return ReadConfiguration<T>(filePath) ?? throw new InvalidDataException();
             } catch (Exception ex) when (ex is FileNotFoundException or JsonReaderException or JsonSerializationException or InvalidDataException) {
                 /* Backup invalid file */
-                if (File.Exists(filePath)) {
+                if (File.Exists(filePath) && !File.Exists($"{filePath}.dirty")) {
                     File.Move(filePath, $"{filePath}.dirty", true);
                 }
                 /* Create defaults */
