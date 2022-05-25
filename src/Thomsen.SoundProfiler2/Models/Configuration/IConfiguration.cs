@@ -1,4 +1,6 @@
-﻿namespace Thomsen.SoundProfiler2.Models.Configuration {
+﻿using System;
+
+namespace Thomsen.SoundProfiler2.Models.Configuration {
     public interface IConfiguration {
         #region Public Properties
         public string Name { get; set; }
@@ -6,7 +8,7 @@
 
         #region Public Methods
         public static IConfiguration GetDefaultModel() {
-            return null;
+            throw new NotImplementedException();
         }
         #endregion Public Methods
     }

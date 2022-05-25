@@ -25,24 +25,33 @@ namespace Thomsen.SoundProfiler2.Handler {
                     try {
                         session.GetDisplayName(out string displayName);
                         session.GetProcessId(out uint pid);
-                        (session as ISimpleAudioVolume).GetMasterVolume(out float volumeLevel);
+                        ((ISimpleAudioVolume)session).GetMasterVolume(out float volumeLevel);
 
                         if (pid == 0) {
                             /* Skip idle thread */
                             continue;
                         }
 
-                        var process = Process.GetProcessById((int)pid);
+                        Process? process = Process.GetProcessById((int)pid);
+
+                        if (process is null) {
+                            /* Skip non retrievable process */
+                            continue;
+                        }
 
                         string friendlyName = !string.IsNullOrWhiteSpace(displayName)
                             ? displayName
                             : !string.IsNullOrWhiteSpace(process.MainWindowTitle) ? process.MainWindowTitle : process.ProcessName;
 
-                        Icon icon;
+                        Icon? icon = null;
                         try {
-                            icon = Icon.ExtractAssociatedIcon(process.MainModule.FileName);
-                        } catch (Win32Exception) {
-                            icon = Resources.icon1;
+                            if (process.MainModule is not null && !string.IsNullOrEmpty(process.MainModule.FileName)) {
+                                icon = Icon.ExtractAssociatedIcon(process.MainModule.FileName);
+                            }
+                        } catch (Win32Exception) { }
+
+                        if (icon is null) {
+                            icon = Resources.Win32Project_16x_ico;
                         }
 
                         mixerApplications.Add(new MixerApplicationModel() {
@@ -74,7 +83,7 @@ namespace Thomsen.SoundProfiler2.Handler {
                             session.GetProcessId(out uint pid);
 
                             if (pid == mixerApplication.ProcessId) {
-                                (session as ISimpleAudioVolume).SetMasterVolume(mixerApplication.VolumeLevel, Guid.Empty);
+                                ((ISimpleAudioVolume)session).SetMasterVolume(mixerApplication.VolumeLevel, Guid.Empty);
                                 return;
                             }
                         } finally {
@@ -114,8 +123,17 @@ namespace Thomsen.SoundProfiler2.Handler {
         }
 
         private static IMMDevice GetActiveMultimediaDevice(bool isInput = false) {
-            var deviceEnumeratorType = Type.GetTypeFromCLSID(new Guid(ComCLSIDs.MMDeviceEnumeratorCLSID));
-            IMMDeviceEnumerator deviceEnumerator = (IMMDeviceEnumerator)Activator.CreateInstance(deviceEnumeratorType);
+            Type? deviceEnumeratorType = Type.GetTypeFromCLSID(new Guid(ComCLSIDs.MMDeviceEnumeratorCLSID));
+
+            if (deviceEnumeratorType is null) {
+                throw new InvalidOperationException("Could not create device enumerator");
+            }
+
+            IMMDeviceEnumerator? deviceEnumerator = (IMMDeviceEnumerator?)Activator.CreateInstance(deviceEnumeratorType);
+
+            if (deviceEnumerator is null) {
+                throw new InvalidOperationException("Failed to create device enumerator");
+            }
 
             try {
                 deviceEnumerator.GetDefaultAudioEndpoint(isInput ? EDataFlow.eCapture : EDataFlow.eRender, ERole.eMultimedia, out IMMDevice device);
@@ -126,8 +144,17 @@ namespace Thomsen.SoundProfiler2.Handler {
         }
 
         private static IMMDevice[] GetDevices(bool isInput = false) {
-            var deviceEnumeratorType = Type.GetTypeFromCLSID(new Guid(ComCLSIDs.MMDeviceEnumeratorCLSID));
-            IMMDeviceEnumerator deviceEnumerator = (IMMDeviceEnumerator)Activator.CreateInstance(deviceEnumeratorType);
+            Type? deviceEnumeratorType = Type.GetTypeFromCLSID(new Guid(ComCLSIDs.MMDeviceEnumeratorCLSID));
+
+            if (deviceEnumeratorType is null) {
+                throw new InvalidOperationException("Could not create device enumerator");
+            }
+
+            IMMDeviceEnumerator? deviceEnumerator = (IMMDeviceEnumerator?)Activator.CreateInstance(deviceEnumeratorType);
+
+            if (deviceEnumerator is null) {
+                throw new InvalidOperationException("Failed to create device enumerator");
+            }
 
             try {
                 deviceEnumerator.EnumAudioEndpoints(isInput ? EDataFlow.eCapture : EDataFlow.eRender, DEVICE_STATE_XXX.DEVICE_STATE_ACTIVE, out IMMDeviceCollection deviceCollection);
@@ -158,7 +185,7 @@ namespace Thomsen.SoundProfiler2.Handler {
                     if (key.fmtid == PropertyKeys.PKEY_DeviceInterface_FriendlyName) {
                         properties.GetValue(ref key, out PROPVARIANT value);
                         if ((VarEnum)value.vt == VarEnum.VT_LPWSTR) {
-                            return Marshal.PtrToStringUni(value.Data.AsStringPtr);
+                            return Marshal.PtrToStringUni(value.Data.AsStringPtr) ?? "";
                         } else {
                             /* Unexpected type */
                             throw new NotImplementedException("Unexpected type");
@@ -170,7 +197,7 @@ namespace Thomsen.SoundProfiler2.Handler {
             }
 
             /* None found */
-            return null;
+            return "";
         }
         #endregion Private Methods
     }

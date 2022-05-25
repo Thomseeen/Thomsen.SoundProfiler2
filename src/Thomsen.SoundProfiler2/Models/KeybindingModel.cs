@@ -2,12 +2,12 @@
 
 using Thomsen.SoundProfiler2.Models.Configuration;
 
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.Models {
     public class KeybindingModel : BaseModel, IConfigurationCollection {
         #region Private Fields
-        private string _name;
+        private string _name = null!;
 
         private Key _key;
         private ModifierKeys _modifier;
@@ -102,7 +102,7 @@ namespace Thomsen.SoundProfiler2.Models {
 
     public class CategoryKeybindingModel : KeybindingModel {
         #region Private Fields
-        private string _categoryName;
+        private string _categoryName = null!;
         #endregion Private Fields
 
         #region Public Properties

@@ -1,10 +1,10 @@
 ﻿
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.Models {
     public class CategoryVolumeModel : BaseModel {
         #region Private Fields
-        private string _name;
+        private string _name = null!;
 
         private float _volume;
         #endregion Private Fields
@@ -12,17 +12,22 @@ namespace Thomsen.SoundProfiler2.Models {
         #region Public Properties
         public string Name {
             get => _name;
-            set { _name = value; OnPropertyChanged(); }
+            set {
+                _name = value; OnPropertyChanged();
+            }
         }
 
         public float Volume {
             get => _volume;
-            set { _volume = value < 0 ? 0 : value > 1 ? 1 : value; OnPropertyChanged(); }
+            set {
+                _volume = value < 0 ? 0 : value > 1 ? 1 : value; OnPropertyChanged();
+            }
         }
         #endregion Public Properties
 
         #region Constructors
-        public CategoryVolumeModel() { }
+        public CategoryVolumeModel() {
+        }
 
         public CategoryVolumeModel(string name, float volume) {
             Name = name;

@@ -18,11 +18,13 @@
     <SignAssembly>false</SignAssembly>
     <Authors>Thomas Wagner</Authors>
     <Company>Thomas Wagner</Company>
-    <Copyright>Copyright (c) 2022 Thomas Wagner</Copyright>
-    <RepositoryUrl>https://github.com/Thomseeen/SoundProfiler2</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/Thomseeen/SoundProfiler2</PackageProjectUrl>
+    <Copyright>Copyright © 2022</Copyright>
+    <RepositoryUrl>https://github.com/Thomseeen/Thomsen.SoundProfiler2</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Thomseeen/Thomsen.SoundProfiler2</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseFile>..\..\LICENSE.txt</PackageLicenseFile>
+    <BaseOutputPath>..\..\bin\</BaseOutputPath>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -33,16 +35,14 @@
   </PropertyGroup>
 
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\TextTemplating\Microsoft.TextTemplating.targets" />
-
-  <Import Project="..\Util\Util.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\Vannatech.CoreAudio\Vannatech.CoreAudio.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,10 +91,6 @@
     <None Remove="Resources\ToggleOfficeKeyboardScheme_16x.png" />
     <None Remove="Resources\Win32Project_16x.ico" />
     <None Remove="Resources\Win32Project_16x.png" />
-    <None Include="..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
     <None Include="Resources\icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

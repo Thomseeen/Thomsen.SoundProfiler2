@@ -4,13 +4,13 @@ using System.Collections.ObjectModel;
 
 using Thomsen.SoundProfiler2.Models.Configuration;
 
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.Models {
     public class CategoryMappingModel : BaseModel, IConfigurationCollection {
         #region Private Fields
-        private string _name;
-        private ObservableCollection<ProgramModel> _programs;
+        private string _name = null!;
+        private ObservableCollection<ProgramModel> _programs = null!;
         #endregion Private Fields
 
         #region Public Properties

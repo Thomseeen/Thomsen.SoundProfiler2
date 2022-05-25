@@ -22,10 +22,10 @@ namespace Thomsen.SoundProfiler2.Handler {
         private readonly ModifierKeys _modifier;
         private readonly Key _key;
 
-        private Window _view;
+        private Window? _view;
 
-        private ICommand _command;
-        private object _commandParameter;
+        private ICommand? _command;
+        private object? _commandParameter;
 
         private bool isDisposed;
         #endregion Private Fields
@@ -38,7 +38,7 @@ namespace Thomsen.SoundProfiler2.Handler {
         #endregion Constructor
 
         #region Public Methods
-        public void Register(Window view, ICommand command, object commandParameter = null) {
+        public void Register(Window view, ICommand command, object? commandParameter = null) {
             _command = command;
             _commandParameter = commandParameter;
             _view = view;
@@ -63,6 +63,10 @@ namespace Thomsen.SoundProfiler2.Handler {
 
         #region Private Methods
         private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) {
+            if (_command is null) {
+                return IntPtr.Zero;
+            }
+
             if (msg == WM_HOTKEY) {
                 int iparam = lParam.ToInt32();
 

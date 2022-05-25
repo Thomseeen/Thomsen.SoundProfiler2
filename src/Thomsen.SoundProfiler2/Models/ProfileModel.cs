@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 
 using Thomsen.SoundProfiler2.Models.Configuration;
 
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.Models {
     public class ProfileModel : BaseModel, IConfigurationCollection {
         #region Private Fields
-        private string _name;
+        private string _name = null!;
 
-        private ObservableCollection<CategoryVolumeModel> _categoryVolumes;
+        private ObservableCollection<CategoryVolumeModel> _categoryVolumes = null!;
         #endregion Private Fields
 
         #region Public Properties

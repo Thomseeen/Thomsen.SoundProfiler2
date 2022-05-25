@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.Models {
     public class MixerApplicationModel : BaseModel {
@@ -14,12 +14,12 @@ namespace Thomsen.SoundProfiler2.Models {
 
         #region Private Fields
         private int _processId;
-        private string _deviceName;
-        private string _friendlyName;
-        private string _processName;
-        private Icon _applicationIcon;
+        private string _deviceName = null!;
+        private string _friendlyName = null!;
+        private string _processName = null!;
+        private Icon _applicationIcon = null!;
 
-        private string _category;
+        private string _category = null!;
 
         private float _volumeLevel;
         #endregion Private Fields

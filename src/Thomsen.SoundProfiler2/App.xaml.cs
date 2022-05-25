@@ -7,7 +7,7 @@ using System.Windows.Threading;
 
 using Thomsen.SoundProfiler2.ViewModels;
 
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 [assembly: SupportedOSPlatform("windows")]
 namespace SoundProfiler2 {
@@ -16,7 +16,7 @@ namespace SoundProfiler2 {
     /// </summary>
     public partial class App : Application {
         #region Private Fields
-        private BaseViewModel _viewModel;
+        private readonly MainViewModel _viewModel = new();
         #endregion Private Fields
 
         #region Application Overrides
@@ -27,7 +27,6 @@ namespace SoundProfiler2 {
             DispatcherUnhandledException += Dispatcher_UnhandledException;
             TaskScheduler.UnobservedTaskException += Task_UnhandledException;
 
-            _viewModel = new MainViewModel();
             _viewModel.Show();
         }
 
@@ -39,15 +38,15 @@ namespace SoundProfiler2 {
         #endregion Application Overrides
 
         #region Crash Handling
-        private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
+        private void App_UnhandledException(object? sender, UnhandledExceptionEventArgs e) {
             WriteCrashDump("App", (Exception)e.ExceptionObject);
         }
 
-        private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
+        private void Dispatcher_UnhandledException(object? sender, DispatcherUnhandledExceptionEventArgs e) {
             WriteCrashDump("Dispatcher", e.Exception);
         }
 
-        private void Task_UnhandledException(object sender, UnobservedTaskExceptionEventArgs e) {
+        private void Task_UnhandledException(object? sender, UnobservedTaskExceptionEventArgs e) {
             WriteCrashDump("Task", e.Exception);
         }
 
@@ -69,6 +68,9 @@ namespace SoundProfiler2 {
             writer.WriteLine($"---");
             writer.WriteLine($"{ex}");
             writer.WriteLine($"---");
+
+            writer.Flush();
+            writer.Close();
         }
         #endregion Crash Handling
     }

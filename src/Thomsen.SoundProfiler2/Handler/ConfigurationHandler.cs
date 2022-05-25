@@ -24,7 +24,7 @@ namespace Thomsen.SoundProfiler2.Handler {
 
             using StreamReader configurationFileReader = new(filePath);
             using JsonTextReader configurationJsonReader = new(configurationFileReader);
-            return jsonSerializer.Deserialize<T>(configurationJsonReader);
+            return jsonSerializer.Deserialize<T>(configurationJsonReader) ?? throw new InvalidDataException();
         }
 
         public static T ReadOrWriteDefaultConfiguration<T>(string filePath, T defaults) where T : IConfiguration {
@@ -56,7 +56,7 @@ namespace Thomsen.SoundProfiler2.Handler {
 
             using StreamReader configurationFileReader = new(filePath);
             using JsonTextReader configurationJsonReader = new(configurationFileReader);
-            return jsonSerializer.Deserialize<IEnumerable<T>>(configurationJsonReader).OrderBy(setting => setting.Name);
+            return jsonSerializer.Deserialize<IEnumerable<T>>(configurationJsonReader)?.OrderBy(setting => setting.Name) ?? throw new InvalidDataException();
         }
 
         public static IEnumerable<T> ReadOrWriteDefaultConfigurationCollection<T>(string filePath, IEnumerable<T> defaults) where T : IConfigurationCollection {

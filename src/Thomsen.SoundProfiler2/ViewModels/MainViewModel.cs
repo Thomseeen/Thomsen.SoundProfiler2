@@ -16,11 +16,11 @@ using Thomsen.SoundProfiler2.Models.Configuration;
 using Thomsen.SoundProfiler2.Properties;
 using Thomsen.SoundProfiler2.Views;
 
-using Util;
-using Util.MVVM;
+using Thomsen.WpfTools.Util;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.ViewModels {
-    public class MainViewModel : BaseViewModel {
+    public class MainViewModel : BaseViewModel<MainView> {
         #region Private Constants
         private const string DEFAULT_CONFIGURATION_FILEPATH = "configuration.json";
 
@@ -36,45 +36,49 @@ namespace Thomsen.SoundProfiler2.ViewModels {
 
         private readonly List<GlobalHotKeyHandler> _globalKeybindingHandlers = new();
 
-        private string _currentTime;
+        private string _currentTime = null!;
 
-        private ProfileModel _activeProfile;
+        private ProfileModel _activeProfile = null!;
 
-        private SoundProfilerConfigurationModel _loadedConfiguration;
+        private SoundProfilerConfigurationModel _loadedConfiguration = null!;
         private ObservableCollection<MixerApplicationModel> _mixerApplications = new();
 
         private bool _isProfileNameEditing;
 
         #region Commands
-        private ICommand _refreshCommand;
-        private ICommand _exitCommand;
-        private ICommand _testCommand;
+        private ICommand? _refreshCommand;
+        private ICommand? _exitCommand;
+        private ICommand? _testCommand;
 
-        private ICommand _addProfileCommand;
-        private ICommand _removeProfileCommand;
-        private ICommand _beginRenameProfileCommand;
-        private ICommand _endRenameProfileCommand;
+        private ICommand? _addProfileCommand;
+        private ICommand? _removeProfileCommand;
+        private ICommand? _beginRenameProfileCommand;
+        private ICommand? _endRenameProfileCommand;
 
-        private ICommand _profileUpCommand;
-        private ICommand _profileDownCommand;
+        private ICommand? _profileUpCommand;
+        private ICommand? _profileDownCommand;
 
-        private ICommand _volumeUpCommand;
-        private ICommand _volumeDownCommand;
+        private ICommand? _volumeUpCommand;
+        private ICommand? _volumeDownCommand;
 
-        private ICommand _editKeybindingsCommand;
-        private ICommand _editMappingsCommand;
+        private ICommand? _editKeybindingsCommand;
+        private ICommand? _editMappingsCommand;
         #endregion Commands
         #endregion Private Fields
 
         #region Public Properties
         public string CurrentTime {
             get => _currentTime;
-            set { _currentTime = value; OnPropertyChanged(); }
+            set {
+                _currentTime = value; OnPropertyChanged();
+            }
         }
 
         public ProfileModel ActiveProfile {
             get => _activeProfile;
-            set { _activeProfile = value; OnPropertyChanged(); }
+            set {
+                _activeProfile = value; OnPropertyChanged();
+            }
         }
 
         public SoundProfilerConfigurationModel LoadedConfiguration {
@@ -90,34 +94,46 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         }
         public CategoryMappingModel LoadedHiddenProgramsMapping {
             get => LoadedConfiguration.HiddenProgramsMapping;
-            set { LoadedConfiguration.HiddenProgramsMapping = value; OnPropertyChanged(); }
+            set {
+                LoadedConfiguration.HiddenProgramsMapping = value; OnPropertyChanged();
+            }
         }
         public ObservableCollection<ProfileModel> LoadedProfiles {
             get => LoadedConfiguration.Profiles;
-            set { LoadedConfiguration.Profiles = value; OnPropertyChanged(); }
+            set {
+                LoadedConfiguration.Profiles = value; OnPropertyChanged();
+            }
         }
         public ObservableCollection<CategoryMappingModel> LoadedMappings {
             get => LoadedConfiguration.Mappings;
-            set { LoadedConfiguration.Mappings = value; OnPropertyChanged(); }
+            set {
+                LoadedConfiguration.Mappings = value; OnPropertyChanged();
+            }
         }
         public ObservableCollection<KeybindingModel> LoadedKeybindings {
             get => LoadedConfiguration.Keybindings;
-            set { LoadedConfiguration.Keybindings = value; OnPropertyChanged(); }
+            set {
+                LoadedConfiguration.Keybindings = value; OnPropertyChanged();
+            }
         }
         public ObservableCollection<MixerApplicationModel> MixerApplications {
             get => _mixerApplications;
-            set { _mixerApplications = value; OnPropertyChanged(); }
+            set {
+                _mixerApplications = value; OnPropertyChanged();
+            }
         }
         public bool IsProfileNameEditing {
             get => _isProfileNameEditing;
-            set { _isProfileNameEditing = value; OnPropertyChanged(); }
+            set {
+                _isProfileNameEditing = value; OnPropertyChanged();
+            }
         }
 
 
         #region Commands
         public ICommand RefreshCommand => _refreshCommand ??= new CommandHandler(param => RefreshAsync(), () => true);
         public ICommand ExitCommand => _exitCommand ??= new CommandHandler(param => Application.Current.Shutdown(), () => true);
-        public ICommand TestCommand => _testCommand ??= new CommandHandler(param => Test(param), () => true);
+        public ICommand TestCommand => _testCommand ??= new CommandHandler(param => Test(param!), () => true);
 
         public ICommand AddProfileCommand => _addProfileCommand ??= new CommandHandler(param => AddProfile(), () => !IsProfileNameEditing);
         public ICommand RemoveProfileCommand => _removeProfileCommand ??= new CommandHandler(param => RemoveProfile(), () => ActiveProfile != null && !IsProfileNameEditing);
@@ -127,8 +143,8 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         public ICommand ProfileUpCommand => _profileUpCommand ??= new CommandHandler(param => ProfileUp(), () => true);
         public ICommand ProfileDownCommand => _profileDownCommand ??= new CommandHandler(param => ProfileDown(), () => true);
 
-        public ICommand VolumeUpCommand => _volumeUpCommand ??= new CommandHandler(param => VolumeUp(param as string), () => true);
-        public ICommand VolumeDownCommand => _volumeDownCommand ??= new CommandHandler(param => VolumeDown(param as string), () => true);
+        public ICommand VolumeUpCommand => _volumeUpCommand ??= new CommandHandler(param => VolumeUp((param as string)!), () => true);
+        public ICommand VolumeDownCommand => _volumeDownCommand ??= new CommandHandler(param => VolumeDown((param as string)!), () => true);
 
         public ICommand EditKeybindingsCommand => _editKeybindingsCommand ??= new CommandHandler(param => EditKeybindings(), () => true);
         public ICommand EditMappingsCommand => _editMappingsCommand ??= new CommandHandler(param => EditMappings(), () => true);
@@ -147,23 +163,17 @@ namespace Thomsen.SoundProfiler2.ViewModels {
             string configPath = Settings.Default.LastConfigPath;
 
             if (!string.IsNullOrEmpty(configPath) && File.Exists(configPath)) {
-                LoadedConfiguration = ConfigurationHandler.ReadOrWriteDefaultConfiguration(configPath, SoundProfilerConfigurationModel.GetDefaultModel(configPath));
+                _loadedConfiguration = ConfigurationHandler.ReadOrWriteDefaultConfiguration(configPath, SoundProfilerConfigurationModel.GetDefaultModel(configPath));
             } else {
-                LoadedConfiguration = ConfigurationHandler.ReadOrWriteDefaultConfiguration(DEFAULT_CONFIGURATION_FILEPATH, SoundProfilerConfigurationModel.GetDefaultModel(DEFAULT_CONFIGURATION_FILEPATH));
+                _loadedConfiguration = ConfigurationHandler.ReadOrWriteDefaultConfiguration(DEFAULT_CONFIGURATION_FILEPATH, SoundProfilerConfigurationModel.GetDefaultModel(DEFAULT_CONFIGURATION_FILEPATH));
             }
 
             string profileName = Settings.Default.LastProfileName;
             if (!string.IsNullOrEmpty(profileName) && LoadedConfiguration.Profiles.Any(profile => profile.Name == profileName)) {
-                ActiveProfile = LoadedConfiguration.Profiles.Single(profile => profile.Name == profileName);
+                _activeProfile = LoadedConfiguration.Profiles.Single(profile => profile.Name == profileName);
             } else {
-                ActiveProfile = LoadedConfiguration.Profiles.First();
+                _activeProfile = LoadedConfiguration.Profiles.First();
             }
-
-            View = new MainView {
-                DataContext = this
-            };
-
-            View.Loaded += View_Loaded;
         }
         #endregion Constructors
 
@@ -213,12 +223,12 @@ namespace Thomsen.SoundProfiler2.ViewModels {
                 if (!MixerApplications.Any(activeApp => activeApp.ProcessId == newApp.ProcessId)) {
                     newApp.PropertyChanged += MixerApplication_PropertyChanged;
 
-                    SafeDispatcher.Invoke(() => {
+                    SafeDispatcher.SafeInvoke(() => {
                         MixerApplications.Add(newApp);
                     });
                 } else {
 
-                    SafeDispatcher.Invoke(() => {
+                    SafeDispatcher.SafeInvoke(() => {
                         MixerApplicationModel oldApp = MixerApplications.Single(activeApp => activeApp.ProcessId == newApp.ProcessId);
                         oldApp.VolumeLevel = newApp.VolumeLevel;
                         oldApp.ApplicationIcon = newApp.ApplicationIcon;
@@ -229,12 +239,12 @@ namespace Thomsen.SoundProfiler2.ViewModels {
             }
 
             /* Delete old ones */
-            MixerApplications.Where(activeApp => !newMixerApplications.Any(newApp => newApp.ProcessId == activeApp.ProcessId)).ToList().ForEach(mixerApp => SafeDispatcher.Invoke(() => MixerApplications.Remove(mixerApp)));
+            MixerApplications.Where(activeApp => !newMixerApplications.Any(newApp => newApp.ProcessId == activeApp.ProcessId)).ToList().ForEach(mixerApp => SafeDispatcher.SafeInvoke(() => MixerApplications.Remove(mixerApp)));
         }
 
         private void MapCategoriesIntoActiveMixerApps(ObservableCollection<CategoryMappingModel> loadedMappings) {
             foreach (MixerApplicationModel mixerApplication in MixerApplications) {
-                CategoryMappingModel matchCategory = null;
+                CategoryMappingModel? matchCategory = null;
                 int matchScore = 0;
                 foreach (CategoryMappingModel category in loadedMappings) {
                     foreach (ProgramModel program in category.Programs) {
@@ -252,7 +262,7 @@ namespace Thomsen.SoundProfiler2.ViewModels {
 
         private void ApplyProfileToActiveMixerApps(ProfileModel activeProfile) {
             foreach (MixerApplicationModel mixerApplication in MixerApplications) {
-                CategoryVolumeModel category = activeProfile.CategoryVolumes.FirstOrDefault(category => category.Name == mixerApplication.Category);
+                CategoryVolumeModel? category = activeProfile.CategoryVolumes.FirstOrDefault(category => category.Name == mixerApplication.Category);
                 if (category is not null) {
                     mixerApplication.VolumeLevel = category.Volume;
                 }
@@ -279,7 +289,9 @@ namespace Thomsen.SoundProfiler2.ViewModels {
             ConfigurationHandler.WriteConfiguration(LoadedConfiguration, LoadedConfiguration.Path);
 
             IsProfileNameEditing = true;
-            SetTextBoxFocusAndCursor((View as MainView).profileRenameBox, true);
+            if (_view is not null && _view is MainView mainView) {
+                SetTextBoxFocusAndCursor(mainView.profileRenameBox, true);
+            }
         }
 
         private void RemoveProfile() {
@@ -293,7 +305,9 @@ namespace Thomsen.SoundProfiler2.ViewModels {
 
         private void BeginRenameProfile() {
             IsProfileNameEditing = true;
-            SetTextBoxFocusAndCursor((View as MainView).profileRenameBox, false);
+            if (_view is not null && _view is MainView mainView) {
+                SetTextBoxFocusAndCursor(mainView.profileRenameBox, true);
+            }
         }
 
         private void EndRenameProfile() {
@@ -320,7 +334,7 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         }
 
         private void VolumeUp(string categoryName) {
-            CategoryVolumeModel category = ActiveProfile.CategoryVolumes.SingleOrDefault(cat => cat.Name == categoryName);
+            CategoryVolumeModel? category = ActiveProfile.CategoryVolumes.SingleOrDefault(cat => cat.Name == categoryName);
 
             if (category is not null) {
                 category.Volume += DEFAULT_VOLUME_INC;
@@ -328,7 +342,7 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         }
 
         private void VolumeDown(string categoryName) {
-            CategoryVolumeModel category = ActiveProfile.CategoryVolumes.SingleOrDefault(cat => cat.Name == categoryName);
+            CategoryVolumeModel? category = ActiveProfile.CategoryVolumes.SingleOrDefault(cat => cat.Name == categoryName);
 
             if (category is not null) {
                 category.Volume -= DEFAULT_VOLUME_INC;
@@ -372,7 +386,7 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         #endregion DialogHandling
 
         #region UI Handling
-        private void View_Loaded(object sender, RoutedEventArgs e) {
+        protected override void View_Loaded(object sender, RoutedEventArgs e) {
             //ApplyLocalKeybindings();
             AppyGlobalKeybindings();
 
@@ -387,7 +401,7 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         }
         #endregion
 
-        private static void Test(object param) {
+        private static void Test(object _) {
             GC.Collect();
         }
 
@@ -398,13 +412,17 @@ namespace Thomsen.SoundProfiler2.ViewModels {
 
             _globalKeybindingHandlers.Clear();
 
+            if (_view is null) {
+                return;
+            }
+
             foreach (KeybindingModel keybinding in LoadedKeybindings) {
                 GlobalHotKeyHandler hotKey = new(keybinding.Modifier, keybinding.Key);
 
                 if (keybinding is CategoryKeybindingModel catKeybinding) {
-                    hotKey.Register(View, KeybindableCommands[catKeybinding.Name], catKeybinding.CategoryName);
+                    hotKey.Register(_view, KeybindableCommands[catKeybinding.Name], catKeybinding.CategoryName);
                 } else {
-                    hotKey.Register(View, KeybindableCommands[keybinding.Name]);
+                    hotKey.Register(_view, KeybindableCommands[keybinding.Name]);
                 }
 
                 _globalKeybindingHandlers.Add(hotKey);
@@ -413,13 +431,13 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         #endregion Private Methods
 
         #region Event Handler
-        private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e) {
+        private void RefreshTimer_Elapsed(object? sender, ElapsedEventArgs e) {
             RefreshAsync();
 
-            SafeDispatcher.Invoke(() => CurrentTime = DateTime.Now.ToString("H:mm d.M.yyyy"));
+            SafeDispatcher.SafeInvoke(() => CurrentTime = DateTime.Now.ToString("H:mm d.M.yyyy"));
         }
 
-        private void MixerApplication_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+        private void MixerApplication_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
             if (sender is MixerApplicationModel mixerApplication && e.PropertyName == nameof(MixerApplicationModel.VolumeLevel)) {
                 /* Stop timer so the value isn't refreshed while user adjusts values */
                 _refreshTimer.Stop();

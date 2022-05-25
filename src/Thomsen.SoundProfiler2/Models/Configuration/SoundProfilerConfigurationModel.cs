@@ -1,18 +1,18 @@
 ﻿using System.Collections.ObjectModel;
 
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.Models.Configuration {
     public class SoundProfilerConfigurationModel : BaseModel, IConfiguration {
         #region Private Fields
-        private string _name;
-        private string _path;
+        private string _name = null!;
+        private string _path = null!;
 
-        private ObservableCollection<ProfileModel> _profiles;
-        private ObservableCollection<CategoryMappingModel> _mappings;
-        private ObservableCollection<KeybindingModel> _keybindings;
+        private ObservableCollection<ProfileModel> _profiles = null!;
+        private ObservableCollection<CategoryMappingModel> _mappings = null!;
+        private ObservableCollection<KeybindingModel> _keybindings = null!;
 
-        private CategoryMappingModel _hiddenProgramsMapping;
+        private CategoryMappingModel _hiddenProgramsMapping = null!;
         #endregion Private Fields
 
         #region Public Properties

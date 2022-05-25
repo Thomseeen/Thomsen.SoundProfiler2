@@ -3,39 +3,39 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Util.Converter {
+namespace Thomsen.WpfTools.Util.Converter {
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public class VisibilityBooleanConverter : IValueConverter {
         #region Private Fields
-        private bool not = false;
-        private bool inverted = false;
+        private bool _not = false;
+        private bool _inverted = false;
         #endregion Private Fields
 
         #region Properties
         public bool Inverted {
-            get => inverted;
-            set => inverted = value;
+            get => _inverted;
+            set => _inverted = value;
         }
 
         public bool Not {
-            get => not;
-            set => not = value;
+            get => _not;
+            set => _not = value;
         }
         #endregion Properties
 
         #region Private Methods
         private object VisibilityToBool(object value) {
-            if (!(value is Visibility))
+            if (value is not Visibility)
                 return DependencyProperty.UnsetValue;
 
-            return (((Visibility)value) == Visibility.Visible) ^ Not;
+            return (Visibility)value == Visibility.Visible ^ Not;
         }
 
         private object BoolToVisibility(object value) {
-            if (!(value is bool))
+            if (value is not bool)
                 return DependencyProperty.UnsetValue;
 
-            return ((bool)value ^ Not) ? Visibility.Visible : Visibility.Collapsed;
+            return (bool)value ^ Not ? Visibility.Visible : Visibility.Collapsed;
         }
         #endregion Private Methods
 

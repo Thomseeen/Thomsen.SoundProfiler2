@@ -5,15 +5,14 @@ VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thomsen.SoundProfiler2", "src\Thomsen.SoundProfiler2\Thomsen.SoundProfiler2.csproj", "{CAE8C69E-A380-452F-950A-04BAFA61D35C}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Util", "src\Util\Util.shproj", "{A55C416F-A71A-49D8-9D7C-78A10BDB645A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vannatech.CoreAudio", "src\Vannatech.CoreAudio\Vannatech.CoreAudio.csproj", "{2222E8D7-6130-4B46-9749-474E3FE2891B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7B286B8F-B6DF-4F5A-8459-9D8506429CA9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Util\Util.projitems*{a55c416f-a71a-49d8-9d7c-78a10bdb645a}*SharedItemsImports = 13
-		src\Util\Util.projitems*{cae8c69e-a380-452f-950a-04bafa61d35c}*SharedItemsImports = 5
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64

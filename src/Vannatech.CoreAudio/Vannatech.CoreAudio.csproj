@@ -9,6 +9,7 @@
     <Authors>Vannatech</Authors>
     <Company>Vannatech</Company>
     <Copyright>Copyright (c) 2008 Vannatech</Copyright>
+    <BaseOutputPath>..\..\bin\lib</BaseOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

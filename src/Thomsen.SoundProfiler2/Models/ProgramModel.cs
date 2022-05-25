@@ -1,10 +1,10 @@
 ﻿
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.Models {
     public class ProgramModel : BaseModel {
         #region Private Fields
-        private string _name;
+        private string _name = null!;
         #endregion Private Fields
 
         #region Public Properties

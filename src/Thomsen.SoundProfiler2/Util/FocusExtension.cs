@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Windows;
 
-namespace Util {
+namespace Thomsen.WpfTools.Util {
     public static class FocusExtension {
         #region Properties
-        public static readonly DependencyProperty IsFocusedProperty = DependencyProperty.RegisterAttached(nameof(FrameworkElement.IsFocused), typeof(bool?), typeof(FocusExtension), new FrameworkPropertyMetadata(IsFocusedChanged) { BindsTwoWayByDefault = true });
+        public static readonly DependencyProperty IsFocusedProperty = DependencyProperty.RegisterAttached(
+            name: nameof(FrameworkElement.IsFocused),
+            propertyType: typeof(bool?),
+            ownerType: typeof(FocusExtension),
+            defaultMetadata: new FrameworkPropertyMetadata(IsFocusedChanged) {
+                BindsTwoWayByDefault = true
+            });
         #endregion Properties
 
         #region Public Methods
         public static bool? GetIsFocused(DependencyObject element) {
-            if (element == null) {
+            if (element is null) {
                 throw new ArgumentNullException(nameof(element));
             }
 
@@ -17,7 +23,7 @@ namespace Util {
         }
 
         public static void SetIsFocused(DependencyObject element, bool? value) {
-            if (element == null) {
+            if (element is null) {
                 throw new ArgumentNullException(nameof(element));
             }
 
@@ -29,7 +35,7 @@ namespace Util {
         private static void IsFocusedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var frameworkElement = (FrameworkElement)d;
 
-            if (e.OldValue == null) {
+            if (e.OldValue is null) {
                 frameworkElement.GotFocus += FrameworkElement_GotFocus;
                 frameworkElement.LostFocus += FrameworkElement_LostFocus;
             }
@@ -38,12 +44,11 @@ namespace Util {
                 frameworkElement.IsVisibleChanged += new DependencyPropertyChangedEventHandler(FrameworkElement_IsVisibleChanged);
             }
 
-            if (e.NewValue != null && (bool)e.NewValue) {
+            if (e.NewValue is not null && (bool)e.NewValue) {
                 frameworkElement.Focus();
             }
         }
         #endregion Private Methods
-
 
         #region EventHandler
         private static void FrameworkElement_GotFocus(object sender, RoutedEventArgs e) {

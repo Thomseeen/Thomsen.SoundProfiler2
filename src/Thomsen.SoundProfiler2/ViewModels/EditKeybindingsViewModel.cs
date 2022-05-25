@@ -5,25 +5,25 @@ using System.Windows.Input;
 using Thomsen.SoundProfiler2.Models;
 using Thomsen.SoundProfiler2.Views;
 
-using Util.MVVM;
+using Thomsen.WpfTools.Mvvm;
 
 namespace Thomsen.SoundProfiler2.ViewModels {
-    public class EditKeybindingsViewModel : BaseViewModel {
+    public class EditKeybindingsViewModel : BaseViewModel<EditKeybindingsView> {
         #region Private Fields
-        private ObservableCollection<KeybindingModel> _loadedKeybindings;
+        private ObservableCollection<KeybindingModel> _loadedKeybindings = null!;
 
         #region Commands
-        private ICommand _closeCommand;
-        private ICommand _saveCommand;
+        private ICommand? _closeCommand;
+        private ICommand? _saveCommand;
         #endregion Commands
         #endregion Private Fields
 
         #region Public Properties
-        public override string WindowTitle => $"Edit Keybindings";
-
         public ObservableCollection<KeybindingModel> LoadedKeybindings {
             get => _loadedKeybindings;
-            set { _loadedKeybindings = value; OnPropertyChanged(); }
+            set {
+                _loadedKeybindings = value; OnPropertyChanged();
+            }
         }
 
         #region Commands
@@ -35,10 +35,6 @@ namespace Thomsen.SoundProfiler2.ViewModels {
         #region Constructors
         public EditKeybindingsViewModel(IEnumerable<KeybindingModel> keybindings) {
             LoadedKeybindings = new ObservableCollection<KeybindingModel>(keybindings);
-
-            View = new EditKeybindingsView {
-                DataContext = this
-            };
         }
         #endregion Constructors
     }
