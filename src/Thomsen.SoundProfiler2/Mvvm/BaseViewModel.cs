@@ -51,10 +51,6 @@ namespace Thomsen.WpfTools.Mvvm {
                 _view = new T {
                     DataContext = this
                 };
-
-                _view.Closed += (s, e) => {
-                    _view = null;
-                };
             }
 
             _view.Loaded += View_Loaded;
